@@ -1012,7 +1012,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 }
               }
               if (snapshot.hasError) {
-                return SizedBox();
+                return const SizedBox();
               } else {
                 return const SizedBox();
               }

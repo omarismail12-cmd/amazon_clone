@@ -252,7 +252,7 @@ class UsersProductService {
       return;
     }
     try {
-      Uuid uuid = Uuid();
+      Uuid uuid = const Uuid();
       await firestore
           .collection('Orders')
           .doc(phone)

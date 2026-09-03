@@ -150,7 +150,7 @@ class _AddressScreenState extends State<AddressScreen> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    Uuid uuid = Uuid();
+                    Uuid uuid = const Uuid();
                     String docID = uuid.v1();
                     AddressModel addressModel = AddressModel(
                       name: nameController.text.trim(),

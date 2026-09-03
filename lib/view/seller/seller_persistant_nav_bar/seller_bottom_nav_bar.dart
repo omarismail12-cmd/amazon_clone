@@ -17,7 +17,7 @@ class _SellerBottomNavBarState extends State<SellerBottomNavBar> {
   List<PersistentTabConfig> _tabs() {
     return [
       PersistentTabConfig(
-        screen: InventoryScreen(),
+        screen: const InventoryScreen(),
         item: ItemConfig(
           icon: const Icon(Icons.inventory_2_outlined),
           title: "Inventory",
@@ -26,7 +26,7 @@ class _SellerBottomNavBarState extends State<SellerBottomNavBar> {
         ),
       ),
       PersistentTabConfig(
-        screen: MonitorScreen(),
+        screen: const MonitorScreen(),
         item: ItemConfig(
           icon: const Icon(Icons.bar_chart_outlined),
           title: "Monitor",

@@ -224,7 +224,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
             //     color: amber,
             //   ),
             // );
-            return SizedBox();
+            return const SizedBox();
           } else {
             if (usersProductProvider.searchedProducts.isEmpty) {
               return const Center(

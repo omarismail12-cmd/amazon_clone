@@ -29,7 +29,7 @@ class _AuthScreenState extends State<AuthScreen> {
         backgroundColor: white,
         centerTitle: true,
         title: Image(
-          image: AssetImage('assets/images/amazon_logo.png'),
+          image: const AssetImage('assets/images/amazon_logo.png'),
           height: height * 0.04,
         ),
       ),

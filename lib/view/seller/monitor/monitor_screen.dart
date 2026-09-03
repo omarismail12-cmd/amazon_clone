@@ -129,7 +129,7 @@ class _MonitorScreenState extends State<MonitorScreen> {
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 if (snapshot.data!.isEmpty) {
-                                  return SizedBox();
+                                  return const SizedBox();
                                 } else {
                                   return Container(
                                     height: height * 0.3,
@@ -327,7 +327,7 @@ class _MonitorScreenState extends State<MonitorScreen> {
                                   style: textTheme.bodyMedium,
                                 );
                               } else {
-                                return SizedBox();
+                                return const SizedBox();
                               }
                             });
                       });
