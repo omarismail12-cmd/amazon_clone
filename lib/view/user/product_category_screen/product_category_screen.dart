@@ -12,14 +12,13 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../../../controller/provier/product_by_category_provider/product_by_category_provider.dart';
-import '../../../controller/services/product_services/product_services.dart';
 import '../../../controller/services/rating_services/rating_services.dart';
 import '../../../model/user_product_model.dart';
 import '../../../utils/colors.dart';
 
 class ProductCategoryScreen extends StatefulWidget {
-  ProductCategoryScreen({super.key, required this.productCategory});
-  String productCategory;
+  const ProductCategoryScreen({super.key, required this.productCategory});
+  final String productCategory;
   @override
   State<ProductCategoryScreen> createState() => _ProductCategoryScreenState();
 }
@@ -147,7 +146,6 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductsBasedOnCategoryProvider>().fetchProducts(

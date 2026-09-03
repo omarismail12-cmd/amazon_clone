@@ -1,9 +1,8 @@
 import 'package:amazon/controller/services/user_data_crud_services/user_data_CRUD_services.dart';
 import 'package:amazon/model/address_model.dart';
-import 'package:amazon/view/user/address_screen/widget/address_screen_textField.dart';
+import 'package:amazon/view/user/address_screen/widget/address_screen_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../constants/common_functions.dart';

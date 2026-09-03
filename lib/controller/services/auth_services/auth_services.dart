@@ -4,7 +4,7 @@ import 'dart:developer';
 
 import 'package:amazon/controller/provier/auth_provider/auth_provider.dart';
 import 'package:amazon/view/auth_screen/otp_screen.dart';
-import 'package:amazon/view/auth_screen/signInLogic.dart';
+import 'package:amazon/view/auth_screen/sign_in_logic.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';

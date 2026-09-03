@@ -4,7 +4,7 @@ import 'package:amazon/controller/provier/rating_provider/rating_provider.dart';
 import 'package:amazon/controller/provier/product_provider/product_provider.dart';
 import 'package:amazon/controller/provier/users_product_provider/users_product_provider.dart';
 import 'package:amazon/utils/theme.dart';
-import 'package:amazon/view/auth_screen/signInLogic.dart';
+import 'package:amazon/view/auth_screen/sign_in_logic.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

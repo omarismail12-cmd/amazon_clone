@@ -6,12 +6,10 @@ import 'package:amazon/constants/constants.dart';
 import 'package:amazon/model/user_product_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../constants/common_functions.dart';
 import '../../../model/product_model.dart';
-import '../../../model/review_model.dart';
 
 class UsersProductService {
   static Future<List<ProductModel>> getProducts(String productName) async {
@@ -20,11 +18,11 @@ class UsersProductService {
       return sellersProducts;
     }
     try {
+      final String query = productName.toLowerCase();
       final QuerySnapshot<Map<String, dynamic>> snapshot = await firestore
           .collection('Products')
-          .orderBy('name')
-          .startAt([productName.toUpperCase()]).endAt(
-              ['${productName.toLowerCase()}\uf8ff']).get();
+          .orderBy('name_lower')
+          .startAt([query]).endAt(['$query']).get();
 
       snapshot.docs.forEach((element) {
         sellersProducts.add(ProductModel.fromMap(element.data()));
@@ -42,10 +40,20 @@ class UsersProductService {
     required BuildContext context,
     required UserProductModel productModel,
   }) async {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      CommonFunctions.showErrorToast(
+          context: context, message: 'No signed-in user found');
+      return;
+    }
     try {
+      // Read-then-write: two concurrent calls for the same product can both
+      // see `value.size < 1` and both write, racing on the same doc. Low
+      // risk for a single-device shopping cart; would need a transaction
+      // to close fully.
       await firestore
           .collection('Cart')
-          .doc(auth.currentUser!.phoneNumber)
+          .doc(phone)
           .collection('myCart')
           .where('productID', isEqualTo: productModel.productID)
           .get()
@@ -53,11 +61,12 @@ class UsersProductService {
         if (value.size < 1) {
           await firestore
               .collection('Cart')
-              .doc(auth.currentUser!.phoneNumber)
+              .doc(phone)
               .collection('myCart')
               .doc(productModel.productID)
               .set(productModel.toMap())
               .whenComplete(() {
+            if (!context.mounted) return;
             log('Data Added');
 
             CommonFunctions.showSuccessToast(
@@ -67,6 +76,7 @@ class UsersProductService {
       });
     } catch (e) {
       log(e.toString());
+      if (!context.mounted) return;
       CommonFunctions.showErrorToast(context: context, message: e.toString());
     }
   }
@@ -75,10 +85,16 @@ class UsersProductService {
     required BuildContext context,
     required ProductModel productModel,
   }) async {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      CommonFunctions.showErrorToast(
+          context: context, message: 'No signed-in user found');
+      return;
+    }
     try {
       await firestore
           .collection('Recently_Seen_Products')
-          .doc(auth.currentUser!.phoneNumber)
+          .doc(phone)
           .collection('products')
           .where('productID', isEqualTo: productModel.productID)
           .get()
@@ -86,7 +102,7 @@ class UsersProductService {
         if (value.size < 1) {
           await firestore
               .collection('Recently_Seen_Products')
-              .doc(auth.currentUser!.phoneNumber)
+              .doc(phone)
               .collection('products')
               .doc(productModel.productID)
               .set(productModel.toMap());
@@ -94,29 +110,40 @@ class UsersProductService {
       });
     } catch (e) {
       log(e.toString());
+      if (!context.mounted) return;
       CommonFunctions.showErrorToast(context: context, message: e.toString());
     }
   }
 
-  static Stream<List<UserProductModel>> fetchCartProducts() => firestore
-      .collection('Cart')
-      .doc(auth.currentUser!.phoneNumber)
-      .collection('myCart')
-      .orderBy('time', descending: true)
-      .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) {
-            return UserProductModel.fromMap(doc.data());
-          }).toList());
+  static Stream<List<UserProductModel>> fetchCartProducts() {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      return const Stream.empty();
+    }
+    return firestore
+        .collection('Cart')
+        .doc(phone)
+        .collection('myCart')
+        .orderBy('time', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return UserProductModel.fromMap(doc.data());
+            }).toList());
+  }
 
   static Future<void> updateCountCartProduct({
     required String productId,
     required int newCount,
     required BuildContext context,
   }) async {
-    final collectionRef = firestore
-        .collection('Cart')
-        .doc(auth.currentUser!.phoneNumber)
-        .collection('myCart');
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      CommonFunctions.showErrorToast(
+          context: context, message: 'No signed-in user found');
+      return;
+    }
+    final collectionRef =
+        firestore.collection('Cart').doc(phone).collection('myCart');
 
     try {
       final snapshot =
@@ -127,6 +154,7 @@ class UsersProductService {
         await collectionRef.doc(docId).update({'productCount': newCount});
       }
     } catch (e) {
+      if (!context.mounted) return;
       CommonFunctions.showErrorToast(context: context, message: e.toString());
     }
   }
@@ -135,10 +163,14 @@ class UsersProductService {
     required String productId,
     required BuildContext context,
   }) async {
-    final collectionRef = firestore
-        .collection('Cart')
-        .doc(auth.currentUser!.phoneNumber)
-        .collection('myCart');
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      CommonFunctions.showErrorToast(
+          context: context, message: 'No signed-in user found');
+      return;
+    }
+    final collectionRef =
+        firestore.collection('Cart').doc(phone).collection('myCart');
 
     try {
       final snapshot =
@@ -149,19 +181,26 @@ class UsersProductService {
         await collectionRef.doc(docId).delete();
       }
     } catch (e) {
+      if (!context.mounted) return;
       CommonFunctions.showErrorToast(context: context, message: e.toString());
     }
   }
 
-  static Stream<List<ProductModel>> fetchKeepShoppingForProducts() => firestore
-      .collection('Recently_Seen_Products')
-      .doc(auth.currentUser!.phoneNumber)
-      .collection('products')
-      .orderBy('uploadedAt', descending: true)
-      .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) {
-            return ProductModel.fromMap(doc.data());
-          }).toList());
+  static Stream<List<ProductModel>> fetchKeepShoppingForProducts() {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      return const Stream.empty();
+    }
+    return firestore
+        .collection('Recently_Seen_Products')
+        .doc(phone)
+        .collection('products')
+        .orderBy('uploadedAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return ProductModel.fromMap(doc.data());
+            }).toList());
+  }
 
   static Future featchDealOfTheDay() async {
     List<ProductModel> sellersProducts = [];
@@ -206,15 +245,22 @@ class UsersProductService {
     required BuildContext context,
     required UserProductModel productModel,
   }) async {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      CommonFunctions.showErrorToast(
+          context: context, message: 'No signed-in user found');
+      return;
+    }
     try {
       Uuid uuid = Uuid();
       await firestore
           .collection('Orders')
-          .doc(auth.currentUser!.phoneNumber)
+          .doc(phone)
           .collection('myOrders')
           .doc(productModel.productID! + uuid.v1())
           .set(productModel.toMap())
           .whenComplete(() {
+        if (!context.mounted) return;
         log('Data Added');
 
         CommonFunctions.showSuccessToast(
@@ -222,26 +268,38 @@ class UsersProductService {
       });
     } catch (e) {
       log(e.toString());
+      if (!context.mounted) return;
       CommonFunctions.showErrorToast(context: context, message: e.toString());
     }
   }
 
-  static Stream<List<UserProductModel>> fetchOrders() => firestore
-      .collection('Orders')
-      .doc(auth.currentUser!.phoneNumber)
-      .collection('myOrders')
-      .orderBy('time', descending: true)
-      .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) {
-            return UserProductModel.fromMap(doc.data());
-          }).toList());
+  static Stream<List<UserProductModel>> fetchOrders() {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      return const Stream.empty();
+    }
+    return firestore
+        .collection('Orders')
+        .doc(phone)
+        .collection('myOrders')
+        .orderBy('time', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return UserProductModel.fromMap(doc.data());
+            }).toList());
+  }
 
   static Future fetchCart() async {
     List<UserProductModel> sellersProducts = [];
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      log('fetchCart: no signed-in user with a phone number');
+      return sellersProducts;
+    }
     try {
       final QuerySnapshot<Map<String, dynamic>> snapshot = await firestore
           .collection('Cart')
-          .doc(auth.currentUser!.phoneNumber)
+          .doc(phone)
           .collection('myCart')
           .get();
       snapshot.docs.forEach((element) {
@@ -253,11 +311,6 @@ class UsersProductService {
       log(e.toString());
     }
     log(sellersProducts.toList().toString());
-    log(sellersProducts.toList().toString());
     return sellersProducts;
   }
-
-  
-
-
 }

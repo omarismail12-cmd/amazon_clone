@@ -39,6 +39,11 @@ class ProductModel {
     return <String, dynamic>{
       'imagesURL': imagesURL,
       'name': name,
+      // Lowercased mirror of `name`, used for case-insensitive prefix
+      // search (product names are free-text seller input with
+      // inconsistent casing, so a plain range query on `name` misses
+      // most matches).
+      'name_lower': name?.toLowerCase(),
       'category': category,
       'description': description,
       'brandName': brandName,

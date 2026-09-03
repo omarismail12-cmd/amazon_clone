@@ -5,7 +5,7 @@ import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/constants/constants.dart';
 import 'package:amazon/controller/provier/product_provider/product_provider.dart';
 import 'package:amazon/model/product_model.dart';
-import 'package:amazon/view/seller/add_product_screen/widget/product_details_common_textField.dart';
+import 'package:amazon/view/seller/add_product_screen/widget/product_details_common_text_field.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -355,7 +355,7 @@ class ProductImageBanner extends StatelessWidget {
             ),
             padding: EdgeInsets.all(5),
             child: CarouselSlider(
-              carouselController: CarouselController(),
+              carouselController: CarouselSliderController(),
               options: CarouselOptions(
                 height: height * 0.23,
                 autoPlay: true,

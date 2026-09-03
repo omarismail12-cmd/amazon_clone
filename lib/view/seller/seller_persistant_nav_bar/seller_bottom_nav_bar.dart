@@ -1,11 +1,6 @@
 import 'package:amazon/view/seller/inventory/inventory_screen.dart';
-import 'package:amazon/view/user/cart/cart_screen.dart';
-import 'package:amazon/view/user/home/home_screen.dart';
-import 'package:amazon/view/user/menu/menu_screen.dart';
-import 'package:amazon/view/user/profile/profile_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import '../../../utils/colors.dart';
 import '../monitor/monitor_screen.dart';
 
@@ -19,23 +14,25 @@ class SellerBottomNavBar extends StatefulWidget {
 class _SellerBottomNavBarState extends State<SellerBottomNavBar> {
   PersistentTabController controller = PersistentTabController(initialIndex: 0);
 
-  List<Widget> _buildScreens() {
-    return [InventoryScreen(), MonitorScreen()];
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
+  List<PersistentTabConfig> _tabs() {
     return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.inventory_2_outlined),
-        title: "Inventory",
-        activeColorPrimary: teal,
-        inactiveColorPrimary: black,
+      PersistentTabConfig(
+        screen: InventoryScreen(),
+        item: ItemConfig(
+          icon: const Icon(Icons.inventory_2_outlined),
+          title: "Inventory",
+          activeForegroundColor: teal,
+          inactiveForegroundColor: black,
+        ),
       ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.bar_chart_outlined),
-        title: "Monitor",
-        activeColorPrimary: teal,
-        inactiveColorPrimary: black,
+      PersistentTabConfig(
+        screen: MonitorScreen(),
+        item: ItemConfig(
+          icon: const Icon(Icons.bar_chart_outlined),
+          title: "Monitor",
+          activeForegroundColor: teal,
+          inactiveForegroundColor: black,
+        ),
       ),
     ];
   }
@@ -43,32 +40,25 @@ class _SellerBottomNavBarState extends State<SellerBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return PersistentTabView(
-      context,
+      tabs: _tabs(),
       controller: controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
       backgroundColor: Colors.white,
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
       stateManagement: true,
-      hideNavigationBarWhenKeyboardShows: true,
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
-      ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: const ItemAnimationProperties(
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
+      selectedTabPressConfig: const SelectedTabPressConfig(
+        popAction: PopActionType.all,
       ),
       screenTransitionAnimation: const ScreenTransitionAnimation(
-        animateTabTransition: true,
-        curve: Curves.ease,
         duration: Duration(milliseconds: 200),
+        curve: Curves.ease,
       ),
-      navBarStyle: NavBarStyle.style3,
+      navBarBuilder: (navBarConfig) => Style3BottomNavBar(
+        navBarConfig: navBarConfig,
+        navBarDecoration: const NavBarDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+      ),
     );
   }
 }

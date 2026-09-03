@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/provier/product_provider/product_provider.dart';
@@ -21,7 +20,6 @@ class InventoryScreen extends StatefulWidget {
 class _InventoryScreenState extends State<InventoryScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SellerProductProvider>().fecthSellerProducts();

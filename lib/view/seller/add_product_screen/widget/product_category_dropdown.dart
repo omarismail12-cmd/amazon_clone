@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../constants/common_functions.dart';
-import '../../../../utils/colors.dart';
 
 class AddProductCommonTextField extends StatelessWidget {
   const AddProductCommonTextField({
@@ -19,7 +18,6 @@ class AddProductCommonTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

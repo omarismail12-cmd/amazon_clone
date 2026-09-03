@@ -4,7 +4,7 @@ import 'package:amazon/view/user/menu/menu_screen.dart';
 import 'package:amazon/view/user/profile/profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import '../../../utils/colors.dart';
 
 class UserBottomNavBar extends StatefulWidget {
@@ -17,40 +17,43 @@ class UserBottomNavBar extends StatefulWidget {
 class _UserBottomNavBarState extends State<UserBottomNavBar> {
   PersistentTabController controller = PersistentTabController(initialIndex: 0);
 
-  List<Widget> _buildScreens() {
+  List<PersistentTabConfig> _tabs() {
     return [
-      const HomeScreen(),
-      const ProfileScreen(),
-      const CartScreen(),
-      const MenuScreen()
-    ];
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.home),
-        title: "Home",
-        activeColorPrimary: teal,
-        inactiveColorPrimary: black,
+      PersistentTabConfig(
+        screen: const HomeScreen(),
+        item: ItemConfig(
+          icon: const Icon(CupertinoIcons.home),
+          title: "Home",
+          activeForegroundColor: teal,
+          inactiveForegroundColor: black,
+        ),
       ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.person),
-        title: "You",
-        activeColorPrimary: teal,
-        inactiveColorPrimary: black,
+      PersistentTabConfig(
+        screen: const ProfileScreen(),
+        item: ItemConfig(
+          icon: const Icon(CupertinoIcons.person),
+          title: "You",
+          activeForegroundColor: teal,
+          inactiveForegroundColor: black,
+        ),
       ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.cart),
-        title: "Cart",
-        activeColorPrimary: teal,
-        inactiveColorPrimary: black,
+      PersistentTabConfig(
+        screen: const CartScreen(),
+        item: ItemConfig(
+          icon: const Icon(CupertinoIcons.cart),
+          title: "Cart",
+          activeForegroundColor: teal,
+          inactiveForegroundColor: black,
+        ),
       ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.menu),
-        title: "Menu",
-        activeColorPrimary: teal,
-        inactiveColorPrimary: black,
+      PersistentTabConfig(
+        screen: const MenuScreen(),
+        item: ItemConfig(
+          icon: const Icon(Icons.menu),
+          title: "Menu",
+          activeForegroundColor: teal,
+          inactiveForegroundColor: black,
+        ),
       ),
     ];
   }
@@ -58,32 +61,25 @@ class _UserBottomNavBarState extends State<UserBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return PersistentTabView(
-      context,
+      tabs: _tabs(),
       controller: controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
       backgroundColor: Colors.white,
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
       stateManagement: true,
-      hideNavigationBarWhenKeyboardShows: true,
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
-      ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: const ItemAnimationProperties(
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
+      selectedTabPressConfig: const SelectedTabPressConfig(
+        popAction: PopActionType.all,
       ),
       screenTransitionAnimation: const ScreenTransitionAnimation(
-        animateTabTransition: true,
-        curve: Curves.ease,
         duration: Duration(milliseconds: 200),
+        curve: Curves.ease,
       ),
-      navBarStyle: NavBarStyle.style3,
+      navBarBuilder: (navBarConfig) => Style3BottomNavBar(
+        navBarConfig: navBarConfig,
+        navBarDecoration: const NavBarDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+      ),
     );
   }
 }

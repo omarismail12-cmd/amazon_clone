@@ -104,14 +104,13 @@ class _ProductScreenState extends State<ProductScreen> {
   executePayment() {
     var options = {
       'key': keyID,
-      // 'amount': widget.productModel.discountedPrice! * 100,
-      'amount': 1 * 100, // Amount is rs 1,
       // here amount * 100 because razorpay counts amount in paisa
-      //i.e 100 paisa = 1 Rupee
+      // i.e 100 paisa = 1 Rupee
+      'amount': (widget.productModel.discountedPrice! * 100).round(),
       // 'image' : '<YOUR BUISNESS EMAIL>'
       'name': widget.productModel.name,
       'description': (widget.productModel.description!.length < 255)
-          ? widget.productModel.description!.length
+          ? widget.productModel.description!
           : widget.productModel.description!.substring(0, 250),
       'prefill': {
         'contact': auth.currentUser!.phoneNumber, //<USERS CONTACT NO.>
@@ -150,7 +149,7 @@ class _ProductScreenState extends State<ProductScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CarouselSlider(
-                carouselController: CarouselController(),
+                carouselController: CarouselSliderController(),
                 options: CarouselOptions(
                   height: height * 0.23,
                   autoPlay: true,

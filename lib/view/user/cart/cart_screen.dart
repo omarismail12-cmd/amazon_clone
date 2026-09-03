@@ -75,6 +75,10 @@ class _CartScreenState extends State<CartScreen> {
         context: context,
         productModel: model,
       );
+      await UsersProductService.removeProductfromCart(
+        productId: product.productID!,
+        context: context,
+      );
     }
   }
 
@@ -87,13 +91,12 @@ class _CartScreenState extends State<CartScreen> {
 
   void _handleExternalWallet(ExternalWalletResponse response) {}
 
-  executePayment() {
+  executePayment(double cartTotal) {
     var options = {
       'key': keyID,
-      // 'amount': widget.productModel.discountedPrice! * 100,
-      'amount': 1 * 100, // Amount is rs 1,
       // here amount * 100 because razorpay counts amount in paisa
-      //i.e 100 paisa = 1 Rupee
+      // i.e 100 paisa = 1 Rupee
+      'amount': (cartTotal * 100).round(),
       // 'image' : '<YOUR BUISNESS EMAIL>'
       'name': 'Multiple Product',
       'description': 'Multiple Product',
@@ -209,7 +212,13 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                           ElevatedButton(
                             onPressed: () async {
-                              executePayment();
+                              final cartTotal = cartProducts.fold(
+                                  0.0,
+                                  (previousValue, product) =>
+                                      previousValue +
+                                      (product.productCount! *
+                                          product.discountedPrice!));
+                              executePayment(cartTotal);
                             },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(

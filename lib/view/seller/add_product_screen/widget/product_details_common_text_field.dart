@@ -4,7 +4,7 @@ import '../../../../constants/common_functions.dart';
 import '../../../../utils/colors.dart';
 
 class AddProductCommonTextField extends StatelessWidget {
-   AddProductCommonTextField({
+  const AddProductCommonTextField({
     super.key,
     required this.title,
     required this.hintText,
@@ -15,7 +15,7 @@ class AddProductCommonTextField extends StatelessWidget {
   final TextEditingController textController;
   final String title;
   final String hintText;
-   TextInputType? textInputType;
+  final TextInputType? textInputType;
 
   @override
   Widget build(BuildContext context) {

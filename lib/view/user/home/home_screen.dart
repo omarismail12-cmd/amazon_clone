@@ -28,7 +28,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  CarouselController todaysDealsCarouselController = CarouselController();
+  CarouselSliderController todaysDealsCarouselController =
+      CarouselSliderController();
 
   checkUserAddress() async {
     bool userAddressPresent = await UserDataCRUD.checkUsersAddress();
@@ -327,7 +328,7 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
     required this.todaysDealsCarouselController,
   });
 
-  final CarouselController todaysDealsCarouselController;
+  final CarouselSliderController todaysDealsCarouselController;
 
   @override
   Widget build(BuildContext context) {
@@ -489,7 +490,7 @@ class HomeScreenBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CarouselSlider(
-      carouselController: CarouselController(),
+      carouselController: CarouselSliderController(),
       options: CarouselOptions(
         height: height * 0.23,
         autoPlay: true,

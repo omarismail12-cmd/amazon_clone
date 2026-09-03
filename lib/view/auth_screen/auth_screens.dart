@@ -54,14 +54,14 @@ class _AuthScreenState extends State<AuthScreen> {
                   height * 0.02,
                   0,
                 ),
-                // SignIn(width, height, textTheme, context),
-                // CreateAccount(width, height, textTheme, context),
+                // signIn(width, height, textTheme, context),
+                // createAccount(width, height, textTheme, context),
 
                 Builder(builder: (context) {
                   if (inLogin) {
-                    return SignIn(width, height, textTheme, context);
+                    return signIn(width, height, textTheme, context);
                   }
-                  return CreateAccount(width, height, textTheme, context);
+                  return createAccount(width, height, textTheme, context);
                 }),
                 CommonFunctions.blankSpace(
                   height * 0.05,
@@ -76,7 +76,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Container SignIn(
+  Container signIn(
       double width, double height, TextTheme textTheme, BuildContext context) {
     return Container(
       width: width,
@@ -312,7 +312,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Container CreateAccount(
+  Container createAccount(
       double width, double height, TextTheme textTheme, BuildContext context) {
     return Container(
       width: width,
@@ -594,14 +594,14 @@ class _AuthScreenState extends State<AuthScreen> {
 }
 
 class CommonAuthButton extends StatelessWidget {
-  CommonAuthButton(
+  const CommonAuthButton(
       {super.key,
       required this.title,
       required this.onPressed,
       required this.btnWidth});
-  String title;
-  VoidCallback onPressed;
-  double btnWidth;
+  final String title;
+  final VoidCallback onPressed;
+  final double btnWidth;
 
   @override
   Widget build(BuildContext context) {
