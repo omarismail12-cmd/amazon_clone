@@ -46,9 +46,13 @@ class AddressModel {
   factory AddressModel.fromMap(Map<String, dynamic> map) {
     return AddressModel(
       name: map['name'] != null ? map['name'] as String : null,
-      mobileNumber: map['mobileNumber'] != null ? map['mobileNumber'] as String : null,
-      authenticatedMobileNumber: map['authenticatedMobileNumber'] != null ? map['authenticatedMobileNumber'] as String : null,
-      houseNumber: map['houseNumber'] != null ? map['houseNumber'] as String : null,
+      mobileNumber:
+          map['mobileNumber'] != null ? map['mobileNumber'] as String : null,
+      authenticatedMobileNumber: map['authenticatedMobileNumber'] != null
+          ? map['authenticatedMobileNumber'] as String
+          : null,
+      houseNumber:
+          map['houseNumber'] != null ? map['houseNumber'] as String : null,
       area: map['area'] != null ? map['area'] as String : null,
       landMark: map['landMark'] != null ? map['landMark'] as String : null,
       pincode: map['pincode'] != null ? map['pincode'] as String : null,

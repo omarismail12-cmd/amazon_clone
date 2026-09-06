@@ -1,5 +1,6 @@
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/user_product_model.dart';
+import 'package:amazon/view/common_widgets/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -70,11 +71,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data!.isEmpty) {
-                return Center(
-                  child: Text(
-                    'Please order Something',
-                    style: textTheme.bodyMedium,
-                  ),
+                return const EmptyState(
+                  icon: Icons.receipt_long_outlined,
+                  message: 'You haven\'t placed any orders yet.',
                 );
               } else {
                 List<UserProductModel> orders = snapshot.data!;
@@ -111,38 +110,35 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             ),
                           );
                         },
-                        child: Container(
-                          height: height * 0.1,
-                          width: width,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
-                            border: Border.all(
-                              color: grey,
-                            ),
-                          ),
+                        child: Card(
                           margin: EdgeInsets.symmetric(
                               horizontal: width * 0.03,
                               vertical: height * 0.01),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: width * 0.03,
-                              vertical: height * 0.01),
-                          child: Row(
-                            children: [
-                              Image(
-                                image:
-                                    NetworkImage(currentProduct.imagesURL![0]),
-                                fit: BoxFit.fitHeight,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: width * 0.03,
+                                vertical: height * 0.01),
+                            child: SizedBox(
+                              height: height * 0.1,
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image(
+                                      image: NetworkImage(
+                                          currentProduct.imagesURL![0]),
+                                      fit: BoxFit.fitHeight,
+                                      height: height * 0.1,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    'Qty: ${currentProduct.productCount!.toStringAsFixed(0)}',
+                                    style: textTheme.bodyMedium,
+                                  ),
+                                ],
                               ),
-                              const Spacer(),
-                              Text(
-                                currentProduct.productCount!.toStringAsFixed(
-                                  0,
-                                ),
-                                style: textTheme.bodyMedium,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       );
@@ -150,18 +146,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
               }
             }
             if (snapshot.hasError) {
-              return Center(
-                child: Text(
-                  'Opps! There is an Error',
-                  style: textTheme.bodyMedium,
-                ),
+              return const EmptyState(
+                icon: Icons.error_outline,
+                message: 'Opps! There is an Error',
               );
             } else {
-              return Center(
-                child: Text(
-                  'Opps! Unable to fetch Orders',
-                  style: textTheme.bodyMedium,
-                ),
+              return const EmptyState(
+                icon: Icons.receipt_long_outlined,
+                message: 'Opps! Unable to fetch Orders',
               );
             }
           }),

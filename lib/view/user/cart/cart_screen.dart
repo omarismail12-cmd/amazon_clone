@@ -6,6 +6,7 @@ import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/user_product_model.dart';
 import 'package:amazon/utils/colors.dart';
+import 'package:amazon/view/common_widgets/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
@@ -137,11 +138,9 @@ class _CartScreenState extends State<CartScreen> {
                   stream: UsersProductService.fetchCartProducts(),
                   builder: (context, snapshot) {
                     if (snapshot.data!.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'Opps! No Product Added To Cart',
-                          style: textTheme.bodyMedium,
-                        ),
+                      return const EmptyState(
+                        icon: Icons.shopping_cart_outlined,
+                        message: 'Your cart is empty.',
                       );
                     }
                     if (snapshot.hasData) {
@@ -150,375 +149,384 @@ class _CartScreenState extends State<CartScreen> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Subtotal ',
-                                  style: textTheme.bodyLarge,
-                                ),
-                                TextSpan(
-                                  text:
-                                      '₹ ${cartProducts.fold(0.0, (previousValue, product) => previousValue + (product.productCount! * product.discountedPrice!)).toStringAsFixed(0)}',
-                                  style: textTheme.displaySmall!.copyWith(
-                                    fontWeight: FontWeight.bold,
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Subtotal ',
+                                          style: textTheme.bodyLarge,
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              '₹ ${cartProducts.fold(0.0, (previousValue, product) => previousValue + (product.productCount! * product.discountedPrice!)).toStringAsFixed(0)}',
+                                          style:
+                                              textTheme.displaySmall!.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          CommonFunctions.blankSpace(
-                            height * 0.01,
-                            0,
-                          ),
-                          SizedBox(
-                            height: height * 0.06,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.check_circle,
-                                  color: teal,
-                                ),
-                                CommonFunctions.blankSpace(
-                                  0,
-                                  width * 0.01,
-                                ),
-                                Expanded(
-                                  child: Column(
+                                  CommonFunctions.blankSpace(
+                                    height * 0.01,
+                                    0,
+                                  ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      RichText(
-                                          textAlign: TextAlign.justify,
-                                          text: TextSpan(children: [
-                                            TextSpan(
-                                              text:
-                                                  'Your Order is eligible for FREE Delivery. ',
-                                              style:
-                                                  textTheme.bodySmall!.copyWith(
-                                                color: teal,
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: teal,
+                                      ),
+                                      CommonFunctions.blankSpace(
+                                        0,
+                                        width * 0.01,
+                                      ),
+                                      Expanded(
+                                        child: RichText(
+                                            textAlign: TextAlign.justify,
+                                            text: TextSpan(children: [
+                                              TextSpan(
+                                                text:
+                                                    'Your Order is eligible for FREE Delivery. ',
+                                                style: textTheme.bodySmall!
+                                                    .copyWith(
+                                                  color: teal,
+                                                ),
                                               ),
-                                            ),
-                                            TextSpan(
-                                              text:
-                                                  'Select this option at checkout.',
-                                              style: textTheme.bodySmall,
-                                            ),
-                                          ]))
+                                              TextSpan(
+                                                text:
+                                                    'Select this option at checkout.',
+                                                style: textTheme.bodySmall,
+                                              ),
+                                            ])),
+                                      ),
                                     ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              final cartTotal = cartProducts.fold(
-                                  0.0,
-                                  (previousValue, product) =>
-                                      previousValue +
-                                      (product.productCount! *
-                                          product.discountedPrice!));
-                              executePayment(cartTotal);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  10,
-                                ),
-                              ),
-                              backgroundColor: amber,
-                              minimumSize: Size(
-                                width,
-                                height * 0.06,
+                                  CommonFunctions.blankSpace(
+                                    height * 0.02,
+                                    0,
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      final cartTotal = cartProducts.fold(
+                                          0.0,
+                                          (previousValue, product) =>
+                                              previousValue +
+                                              (product.productCount! *
+                                                  product.discountedPrice!));
+                                      executePayment(cartTotal);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      minimumSize: Size(width, height * 0.06),
+                                    ),
+                                    child: const Text('Proceed to Buy'),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Text(
-                              'Proceed to Buy',
-                              style: textTheme.bodyMedium,
-                            ),
                           ),
-                          CommonFunctions.blankSpace(
-                            height * 0.02,
-                            0,
-                          ),
-                          CommonFunctions.divider(),
                           CommonFunctions.blankSpace(
                             height * 0.02,
                             0,
                           ),
                           ListView.builder(
-                              itemCount: cartProducts.length,
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                UserProductModel currenProduct =
-                                    cartProducts[index];
-                                return Container(
-                                  // height: height * 0.2,
-                                  width: width,
+                            itemCount: cartProducts.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              UserProductModel currenProduct =
+                                  cartProducts[index];
+                              return Dismissible(
+                                key: ValueKey(currenProduct.productID),
+                                direction: DismissDirection.endToStart,
+                                onDismissed: (_) async {
+                                  await UsersProductService
+                                      .removeProductfromCart(
+                                    productId: currenProduct.productID!,
+                                    context: context,
+                                  );
+                                },
+                                background: Container(
+                                  alignment: Alignment.centerRight,
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: width * 0.02,
-                                      vertical: height * 0.01),
+                                      horizontal: width * 0.05),
                                   margin: EdgeInsets.symmetric(
                                     vertical: height * 0.01,
                                   ),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                      10,
-                                    ),
-                                    color: greyShade1,
+                                    color: red,
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 4,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Image(
-                                              image: NetworkImage(
-                                                  currenProduct.imagesURL![0]),
-                                              fit: BoxFit.contain,
-                                            ),
-                                            CommonFunctions.blankSpace(
-                                              height * 0.01,
-                                              0,
-                                            ),
-                                            Container(
-                                              height: height * 0.06,
-                                              width: width,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  10,
-                                                ),
-                                                border: Border.all(
-                                                  color: greyShade3,
-                                                ),
+                                  child: Icon(
+                                    Icons.delete_outline,
+                                    color: white,
+                                  ),
+                                ),
+                                child: Card(
+                                  margin: EdgeInsets.symmetric(
+                                    vertical: height * 0.01,
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: width * 0.02,
+                                        vertical: height * 0.01),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 4,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Image(
+                                                image: NetworkImage(
+                                                    currenProduct
+                                                        .imagesURL![0]),
+                                                fit: BoxFit.contain,
                                               ),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                      flex: 2,
-                                                      child: InkWell(
-                                                        onTap: () async {
-                                                          if (currenProduct
-                                                                  .productCount ==
-                                                              1) {
+                                              CommonFunctions.blankSpace(
+                                                height * 0.01,
+                                                0,
+                                              ),
+                                              Container(
+                                                height: height * 0.06,
+                                                width: width,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    10,
+                                                  ),
+                                                  border: Border.all(
+                                                    color: greyShade3,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 2,
+                                                        child: InkWell(
+                                                          onTap: () async {
+                                                            if (currenProduct
+                                                                    .productCount ==
+                                                                1) {
+                                                              await UsersProductService
+                                                                  .removeProductfromCart(
+                                                                productId:
+                                                                    currenProduct
+                                                                        .productID!,
+                                                                context:
+                                                                    context,
+                                                              );
+                                                            }
                                                             await UsersProductService
-                                                                .removeProductfromCart(
+                                                                .updateCountCartProduct(
                                                               productId:
                                                                   currenProduct
                                                                       .productID!,
+                                                              newCount:
+                                                                  currenProduct
+                                                                          .productCount! -
+                                                                      1,
                                                               context: context,
                                                             );
-                                                          }
-                                                          await UsersProductService
-                                                              .updateCountCartProduct(
-                                                            productId:
-                                                                currenProduct
-                                                                    .productID!,
-                                                            newCount: currenProduct
-                                                                    .productCount! -
-                                                                1,
-                                                            context: context,
-                                                          );
-                                                        },
-                                                        child: Container(
-                                                            height:
-                                                                double.infinity,
-                                                            width:
-                                                                double.infinity,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border: Border(
-                                                                right:
-                                                                    BorderSide(
-                                                                  color:
-                                                                      greyShade3,
+                                                          },
+                                                          child: Container(
+                                                              height: double
+                                                                  .infinity,
+                                                              width: double
+                                                                  .infinity,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border: Border(
+                                                                  right:
+                                                                      BorderSide(
+                                                                    color:
+                                                                        greyShade3,
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                            child: Icon(
-                                                              Icons.remove,
-                                                              color: black,
-                                                            )),
-                                                      )),
-                                                  Expanded(
-                                                      flex: 3,
-                                                      child: Container(
-                                                          color: white,
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child: Text(
-                                                              currenProduct
-                                                                  .productCount
-                                                                  .toString()))),
-                                                  Expanded(
-                                                      flex: 2,
-                                                      child: InkWell(
-                                                        onTap: () async {
-                                                          await UsersProductService
-                                                              .updateCountCartProduct(
-                                                            productId:
-                                                                currenProduct
-                                                                    .productID!,
-                                                            newCount: currenProduct
-                                                                    .productCount! +
-                                                                1,
-                                                            context: context,
-                                                          );
-                                                        },
+                                                              child: Icon(
+                                                                Icons.remove,
+                                                                color: black,
+                                                              )),
+                                                        )),
+                                                    Expanded(
+                                                        flex: 3,
                                                         child: Container(
-                                                            height:
-                                                                double.infinity,
-                                                            width:
-                                                                double.infinity,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border: Border(
-                                                                left:
-                                                                    BorderSide(
-                                                                  color:
-                                                                      greyShade3,
+                                                            color: white,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            child: Text(
+                                                                currenProduct
+                                                                    .productCount
+                                                                    .toString()))),
+                                                    Expanded(
+                                                        flex: 2,
+                                                        child: InkWell(
+                                                          onTap: () async {
+                                                            await UsersProductService
+                                                                .updateCountCartProduct(
+                                                              productId:
+                                                                  currenProduct
+                                                                      .productID!,
+                                                              newCount:
+                                                                  currenProduct
+                                                                          .productCount! +
+                                                                      1,
+                                                              context: context,
+                                                            );
+                                                          },
+                                                          child: Container(
+                                                              height: double
+                                                                  .infinity,
+                                                              width: double
+                                                                  .infinity,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border: Border(
+                                                                  left:
+                                                                      BorderSide(
+                                                                    color:
+                                                                        greyShade3,
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                            child: Icon(
-                                                              Icons.add,
-                                                              color: black,
-                                                            )),
-                                                      ))
+                                                              child: Icon(
+                                                                Icons.add,
+                                                                color: black,
+                                                              )),
+                                                        ))
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        CommonFunctions.blankSpace(
+                                          0,
+                                          width * 0.02,
+                                        ),
+                                        Expanded(
+                                          flex: 7,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                currenProduct.name!,
+                                                maxLines: 3,
+                                                style: textTheme.bodyMedium,
+                                              ),
+                                              CommonFunctions.blankSpace(
+                                                height * 0.01,
+                                                0,
+                                              ),
+                                              Wrap(
+                                                crossAxisAlignment:
+                                                    WrapCrossAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    '₹ ${currenProduct.discountedPrice!.toStringAsFixed(0)}',
+                                                    style: textTheme
+                                                        .displayMedium!
+                                                        .copyWith(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                  ),
+                                                  Text(
+                                                    '\tMRP: ₹',
+                                                    style: textTheme.bodySmall!
+                                                        .copyWith(
+                                                      color: grey,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    ' ${currenProduct.price!.toStringAsFixed(0)}',
+                                                    style: textTheme.bodySmall!
+                                                        .copyWith(
+                                                            color: grey,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .lineThrough),
+                                                  ),
                                                 ],
                                               ),
-                                            )
-                                          ],
+                                              CommonFunctions.blankSpace(
+                                                height * 0.005,
+                                                0,
+                                              ),
+                                              Text(
+                                                currenProduct.discountedPrice! >
+                                                        499
+                                                    ? 'Eligible for Free Shipping'
+                                                    : 'Extra Delivery Charges Applied',
+                                                style: textTheme.bodySmall!
+                                                    .copyWith(color: grey),
+                                              ),
+                                              CommonFunctions.blankSpace(
+                                                height * 0.005,
+                                                0,
+                                              ),
+                                              Text(
+                                                'In Stock',
+                                                style: textTheme.bodySmall!
+                                                    .copyWith(color: teal),
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  OutlinedButton(
+                                                      onPressed: () async {
+                                                        await UsersProductService
+                                                            .removeProductfromCart(
+                                                          productId:
+                                                              currenProduct
+                                                                  .productID!,
+                                                          context: context,
+                                                        );
+                                                      },
+                                                      child:
+                                                          const Text('Delete')),
+                                                  OutlinedButton(
+                                                      onPressed: () {},
+                                                      child: const Text(
+                                                          'Save for Later'))
+                                                ],
+                                              )
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      CommonFunctions.blankSpace(
-                                        0,
-                                        width * 0.02,
-                                      ),
-                                      Expanded(
-                                        flex: 7,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              currenProduct.name!,
-                                              maxLines: 3,
-                                              style: textTheme.bodyMedium,
-                                            ),
-                                            CommonFunctions.blankSpace(
-                                              height * 0.01,
-                                              0,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  '₹ ${currenProduct.discountedPrice!.toStringAsFixed(0)}',
-                                                  style: textTheme
-                                                      .displayMedium!
-                                                      .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  '\tMRP: ₹',
-                                                  style: textTheme.bodySmall!
-                                                      .copyWith(
-                                                    color: grey,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  ' ${currenProduct.price!.toStringAsFixed(0)}',
-                                                  style: textTheme.bodySmall!
-                                                      .copyWith(
-                                                          color: grey,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough),
-                                                ),
-                                              ],
-                                            ),
-                                            CommonFunctions.blankSpace(
-                                              height * 0.005,
-                                              0,
-                                            ),
-                                            Text(
-                                              currenProduct.discountedPrice! >
-                                                      499
-                                                  ? 'Eligible for Free Shipping'
-                                                  : 'Extra Delivery Charges Applied',
-                                              style: textTheme.bodySmall!
-                                                  .copyWith(color: grey),
-                                            ),
-                                            CommonFunctions.blankSpace(
-                                              height * 0.005,
-                                              0,
-                                            ),
-                                            Text(
-                                              'In Stock',
-                                              style: textTheme.bodySmall!
-                                                  .copyWith(color: teal),
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                ElevatedButton(
-                                                    onPressed: () async {
-                                                      await UsersProductService
-                                                          .removeProductfromCart(
-                                                        productId: currenProduct
-                                                            .productID!,
-                                                        context: context,
-                                                      );
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor: white,
-                                                      side: BorderSide(
-                                                        color: greyShade3,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      'Delete',
-                                                      style:
-                                                          textTheme.bodySmall,
-                                                    )),
-                                                ElevatedButton(
-                                                    onPressed: () {},
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor: white,
-                                                      side: BorderSide(
-                                                        color: greyShade3,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      'Save for Later',
-                                                      style:
-                                                          textTheme.bodySmall,
-                                                    ))
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                );
-                              })
+                                ),
+                              );
+                            },
+                          )
                         ],
                       );
                     }
                     if (snapshot.hasError) {
-                      return const Text('Opps! Error Found');
+                      return const EmptyState(
+                        icon: Icons.error_outline,
+                        message:
+                            'Opps! Something went wrong loading your cart.',
+                      );
                     } else {
-                      return const Text('Opps! No Product Added To Cart');
+                      return const EmptyState(
+                        icon: Icons.shopping_cart_outlined,
+                        message: 'Your cart is empty.',
+                      );
                     }
                   })
             ],

@@ -1,7 +1,8 @@
-
 import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/provier/product_provider/product_provider.dart';
 import 'package:amazon/model/product_model.dart';
+import 'package:amazon/view/common_widgets/empty_state.dart';
+import 'package:amazon/view/common_widgets/shimmer_box.dart';
 import 'package:amazon/view/seller/add_product_screen/add_products_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -103,15 +104,23 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 Consumer<SellerProductProvider>(
                     builder: (context, sellerProductProvider, child) {
                   if (sellerProductProvider.sellerProductsFetched == false) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    return ListView.builder(
+                      itemCount: 3,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) => Padding(
+                        padding: EdgeInsets.symmetric(vertical: height * 0.01),
+                        child: ShimmerBox(
+                          width: width,
+                          height: height * 0.3,
+                          borderRadius: 16,
+                        ),
+                      ),
                     );
                   } else if (sellerProductProvider.products.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'No Products Found',
-                        style: textTheme.bodyMedium,
-                      ),
+                    return const EmptyState(
+                      icon: Icons.inventory_2_outlined,
+                      message: 'No products found. Add your first product.',
                     );
                   }
                   return ListView.builder(
@@ -121,119 +130,123 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       itemBuilder: (context, index) {
                         ProductModel currentModel =
                             sellerProductProvider.products[index];
-                        return Container(
-                          height: height * 0.3,
-                          width: width,
+                        return Card(
                           margin: EdgeInsets.symmetric(
                             vertical: height * 0.01,
                           ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: width * 0.02,
-                              vertical: height * 0.01),
-                          decoration: BoxDecoration(
-                            color: white,
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
-                            border: Border.all(
-                              color: grey,
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              CarouselSlider(
-                                options: CarouselOptions(
-                                  height: height * 0.2,
-                                  autoPlay: false,
-                                  viewportFraction: 1,
-                                ),
-                                items: currentModel.imagesURL!.map((i) {
-                                  return Builder(
-                                    builder: (BuildContext context) {
-                                      return Container(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        decoration: BoxDecoration(
-                                          color: white,
-                                          image: DecorationImage(
-                                            image: NetworkImage(i),
-                                            fit: BoxFit.contain,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                }).toList(),
-                              ),
-                              const Spacer(),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: width * 0.02,
+                                vertical: height * 0.01),
+                            child: SizedBox(
+                              height: height * 0.3,
+                              width: width,
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    flex: 7,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text(
-                                          currentModel.name!,
-                                          style: textTheme.bodyMedium!.copyWith(
-                                              overflow: TextOverflow.ellipsis,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          currentModel.description!,
-                                          // textAlign: TextAlign.justify,
-                                          maxLines: 2,
-                                          style: textTheme.bodySmall!.copyWith(
-                                              overflow: TextOverflow.ellipsis,
-                                              color: grey),
-                                        ),
-                                      ],
+                                  CarouselSlider(
+                                    options: CarouselOptions(
+                                      height: height * 0.2,
+                                      autoPlay: false,
+                                      viewportFraction: 1,
                                     ),
+                                    items: currentModel.imagesURL!.map((i) {
+                                      return Builder(
+                                        builder: (BuildContext context) {
+                                          return Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            decoration: BoxDecoration(
+                                              color: white,
+                                              image: DecorationImage(
+                                                image: NetworkImage(i),
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }).toList(),
                                   ),
-                                  CommonFunctions.blankSpace(
-                                    0,
-                                    width * 0.02,
+                                  const Spacer(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        flex: 7,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              currentModel.name!,
+                                              style: textTheme.bodyMedium!
+                                                  .copyWith(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            ),
+                                            Text(
+                                              currentModel.description!,
+                                              // textAlign: TextAlign.justify,
+                                              maxLines: 2,
+                                              style: textTheme.bodySmall!
+                                                  .copyWith(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      color: grey),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      CommonFunctions.blankSpace(
+                                        0,
+                                        width * 0.02,
+                                      ),
+                                      Expanded(
+                                        flex: 3,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              '₹ ${currentModel.discountedPrice.toString()}',
+                                              style: textTheme.bodyMedium,
+                                            ),
+                                            Text(
+                                              '₹ ${currentModel.price.toString()}',
+                                              style: textTheme.labelMedium!
+                                                  .copyWith(
+                                                      color: grey,
+                                                      decoration: TextDecoration
+                                                          .lineThrough),
+                                            ),
+                                            Text(
+                                              currentModel.inStock!
+                                                  ? 'in Stock'
+                                                  : 'Out of Stock',
+                                              style: textTheme.bodySmall!
+                                                  .copyWith(
+                                                      color:
+                                                          currentModel.inStock!
+                                                              ? teal
+                                                              : red),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text(
-                                          '₹ ${currentModel.discountedPrice.toString()}',
-                                          style: textTheme.bodyMedium,
-                                        ),
-                                        Text(
-                                          '₹ ${currentModel.price.toString()}',
-                                          style: textTheme.labelMedium!
-                                              .copyWith(
-                                                  color: grey,
-                                                  decoration: TextDecoration
-                                                      .lineThrough),
-                                        ),
-                                        Text(
-                                          currentModel.inStock!
-                                              ? 'in Stock'
-                                              : 'Out of Stock',
-                                          style: textTheme.bodySmall!.copyWith(
-                                              color: currentModel.inStock!
-                                                  ? teal
-                                                  : red),
-                                        ),
-                                      ],
-                                    ),
-                                  )
                                 ],
                               ),
-                            ],
+                            ),
                           ),
                         );
                       });

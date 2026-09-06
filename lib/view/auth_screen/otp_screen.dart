@@ -15,6 +15,23 @@ class OTPScreen extends StatefulWidget {
 
 class _OTPScreenState extends State<OTPScreen> {
   TextEditingController otpController = TextEditingController();
+  bool isVerifying = false;
+  bool isResending = false;
+
+  Future<void> _verify(BuildContext context) async {
+    setState(() => isVerifying = true);
+    await AuthServices.verifyOTP(
+        context: context, otp: otpController.text.trim());
+    if (mounted) setState(() => isVerifying = false);
+  }
+
+  Future<void> _resend(BuildContext context) async {
+    setState(() => isResending = true);
+    await AuthServices.receiveOTP(
+        context: context, mobileNo: widget.mobileNumber);
+    if (mounted) setState(() => isResending = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -80,33 +97,9 @@ class _OTPScreenState extends State<OTPScreen> {
               ),
               TextField(
                 controller: otpController,
-                decoration: InputDecoration(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
                   hintText: 'Enter OTP',
-                  hintStyle: textTheme.bodySmall,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: BorderSide(
-                      color: grey,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: const BorderSide(
-                      color: secondaryColor,
-                    ),
-                  ),
-                  disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: BorderSide(
-                      color: grey,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: BorderSide(
-                      color: grey,
-                    ),
-                  ),
                 ),
               ),
               CommonFunctions.blankSpace(
@@ -115,12 +108,8 @@ class _OTPScreenState extends State<OTPScreen> {
               ),
               CommonAuthButton(
                 title: 'Continue',
-                onPressed: () {
-                  AuthServices.verifyOTP(
-                    context: context,
-                    otp: otpController.text.trim(),
-                  );
-                },
+                isLoading: isVerifying,
+                onPressed: () => _verify(context),
                 btnWidth: 0.94,
               ),
               CommonFunctions.blankSpace(
@@ -131,13 +120,21 @@ class _OTPScreenState extends State<OTPScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Resend OTP',
-                      style: textTheme.bodyMedium!.copyWith(
-                        color: blue,
-                      ),
-                    ),
+                    onPressed: isResending ? null : () => _resend(context),
+                    child: isResending
+                        ? SizedBox(
+                            height: height * 0.02,
+                            width: height * 0.02,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Resend OTP',
+                            style: textTheme.bodyMedium!.copyWith(
+                              color: blue,
+                            ),
+                          ),
                   ),
                 ],
               ),

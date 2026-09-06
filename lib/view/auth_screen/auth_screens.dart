@@ -13,9 +13,16 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   bool inLogin = true;
+  bool isSendingOtp = false;
   String currentCountryCode = '+91';
   TextEditingController mobileController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+
+  Future<void> _sendOtp(BuildContext context, String mobileNo) async {
+    setState(() => isSendingOtp = true);
+    await AuthServices.receiveOTP(context: context, mobileNo: mobileNo);
+    if (mounted) setState(() => isSendingOtp = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +61,15 @@ class _AuthScreenState extends State<AuthScreen> {
                   height * 0.02,
                   0,
                 ),
-                // signIn(width, height, textTheme, context),
-                // createAccount(width, height, textTheme, context),
-
+                _AuthToggle(
+                  inLogin: inLogin,
+                  onSelectSignIn: () => setState(() => inLogin = true),
+                  onSelectCreateAccount: () => setState(() => inLogin = false),
+                ),
+                CommonFunctions.blankSpace(
+                  height * 0.02,
+                  0,
+                ),
                 Builder(builder: (context) {
                   if (inLogin) {
                     return signIn(width, height, textTheme, context);
@@ -88,58 +101,6 @@ class _AuthScreenState extends State<AuthScreen> {
       child: Column(
         children: [
           Container(
-            height: height * 0.06,
-            width: width,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: greyShade3),
-              ),
-              color: greyShade1,
-            ),
-            padding: EdgeInsets.symmetric(horizontal: width * 0.03),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      inLogin = false;
-                    });
-                  },
-                  child: Container(
-                    height: height * 0.03,
-                    width: height * 0.03,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: grey),
-                        color: white),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.circle,
-                      size: height * 0.015,
-                      color: inLogin ? transparent : secondaryColor,
-                    ),
-                  ),
-                ),
-                CommonFunctions.blankSpace(
-                  0,
-                  width * 0.02,
-                ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                          text: 'Create Account. ',
-                          style: textTheme.bodyMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
-                      TextSpan(
-                          text: 'New to Amazon? ', style: textTheme.bodyMedium)
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
             width: width,
             padding: EdgeInsets.symmetric(
               horizontal: width * 0.03,
@@ -147,52 +108,6 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          inLogin = true;
-                        });
-                      },
-                      child: Container(
-                        height: height * 0.03,
-                        width: height * 0.03,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: grey),
-                            color: white),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.circle,
-                          size: height * 0.015,
-                          color: inLogin ? secondaryColor : transparent,
-                        ),
-                      ),
-                    ),
-                    CommonFunctions.blankSpace(
-                      0,
-                      width * 0.02,
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                              text: 'Sign in. ',
-                              style: textTheme.bodyMedium!
-                                  .copyWith(fontWeight: FontWeight.bold)),
-                          TextSpan(
-                              text: 'Already a Customer',
-                              style: textTheme.bodyMedium)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                CommonFunctions.blankSpace(
-                  height * 0.01,
-                  0,
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -221,46 +136,25 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         child: Text(
                           currentCountryCode,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: textTheme.displaySmall!.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: height * 0.06,
-                      width: width * 0.64,
-                      child: TextFormField(
-                        controller: mobileController,
-                        cursorColor: black,
-                        style: textTheme.displaySmall,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          hintText: 'Mobile number',
-                          hintStyle: textTheme.bodySmall,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: const BorderSide(
-                              color: secondaryColor,
-                            ),
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
+                    CommonFunctions.blankSpace(0, width * 0.02),
+                    Expanded(
+                      child: SizedBox(
+                        height: height * 0.06,
+                        child: TextFormField(
+                          controller: mobileController,
+                          cursorColor: black,
+                          style: textTheme.displaySmall,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            hintText: 'Mobile number',
                           ),
                         ),
                       ),
@@ -270,12 +164,9 @@ class _AuthScreenState extends State<AuthScreen> {
                 CommonFunctions.blankSpace(height * 0.02, 0),
                 CommonAuthButton(
                   title: 'Continue',
-                  onPressed: () {
-                    AuthServices.receiveOTP(
-                        context: context,
-                        mobileNo:
-                            '$currentCountryCode${mobileController.text.trim()}');
-                  },
+                  isLoading: isSendingOtp,
+                  onPressed: () => _sendOtp(context,
+                      '$currentCountryCode${mobileController.text.trim()}'),
                   btnWidth: 0.88,
                 ),
                 CommonFunctions.blankSpace(
@@ -331,83 +222,12 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          inLogin = false;
-                        });
-                      },
-                      child: Container(
-                        height: height * 0.03,
-                        width: height * 0.03,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: grey),
-                            color: white),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.circle,
-                          size: height * 0.015,
-                          color: inLogin ? transparent : secondaryColor,
-                        ),
-                      ),
-                    ),
-                    CommonFunctions.blankSpace(
-                      0,
-                      width * 0.02,
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                              text: 'Create Account. ',
-                              style: textTheme.bodyMedium!
-                                  .copyWith(fontWeight: FontWeight.bold)),
-                          TextSpan(
-                              text: 'New to Amazon?',
-                              style: textTheme.bodyMedium)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                CommonFunctions.blankSpace(
-                  height * 0.01,
-                  0,
-                ),
                 SizedBox(
                   height: height * 0.06,
                   child: TextField(
                     controller: nameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'First and Last Name',
-                      hintStyle: textTheme.bodySmall,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: BorderSide(
-                          color: grey,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: secondaryColor,
-                        ),
-                      ),
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: BorderSide(
-                          color: grey,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: BorderSide(
-                          color: grey,
-                        ),
-                      ),
                     ),
                   ),
                 ),
@@ -443,46 +263,25 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         child: Text(
                           currentCountryCode,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: textTheme.displaySmall!.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: height * 0.06,
-                      width: width * 0.64,
-                      child: TextFormField(
-                        controller: mobileController,
-                        cursorColor: black,
-                        style: textTheme.displaySmall,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          hintText: 'Mobile number',
-                          hintStyle: textTheme.bodySmall,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: const BorderSide(
-                              color: secondaryColor,
-                            ),
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
+                    CommonFunctions.blankSpace(0, width * 0.02),
+                    Expanded(
+                      child: SizedBox(
+                        height: height * 0.06,
+                        child: TextFormField(
+                          controller: mobileController,
+                          cursorColor: black,
+                          style: textTheme.displaySmall,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            hintText: 'Mobile number',
                           ),
                         ),
                       ),
@@ -498,12 +297,9 @@ class _AuthScreenState extends State<AuthScreen> {
                 CommonAuthButton(
                   title: 'Continue',
                   btnWidth: 0.88,
-                  onPressed: () {
-                    AuthServices.receiveOTP(
-                        context: context,
-                        mobileNo:
-                            '+$currentCountryCode${mobileController.text.trim()}');
-                  },
+                  isLoading: isSendingOtp,
+                  onPressed: () => _sendOtp(context,
+                      '+$currentCountryCode${mobileController.text.trim()}'),
                 ),
                 CommonFunctions.blankSpace(
                   height * 0.02,
@@ -534,60 +330,97 @@ class _AuthScreenState extends State<AuthScreen> {
               ],
             ),
           ),
-          Container(
-            height: height * 0.06,
-            width: width,
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: greyShade3),
-              ),
-              color: greyShade1,
+        ],
+      ),
+    );
+  }
+}
+
+class _AuthToggle extends StatelessWidget {
+  const _AuthToggle({
+    required this.inLogin,
+    required this.onSelectSignIn,
+    required this.onSelectCreateAccount,
+  });
+
+  final bool inLogin;
+  final VoidCallback onSelectSignIn;
+  final VoidCallback onSelectCreateAccount;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _AuthToggleTab(
+              label: 'Sign in',
+              selected: inLogin,
+              onTap: onSelectSignIn,
             ),
-            padding: EdgeInsets.symmetric(horizontal: width * 0.03),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      inLogin = true;
-                    });
-                  },
-                  child: Container(
-                    height: height * 0.03,
-                    width: height * 0.03,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: grey),
-                        color: white),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.circle,
-                      size: height * 0.015,
-                      color: inLogin ? secondaryColor : transparent,
-                    ),
-                  ),
-                ),
-                CommonFunctions.blankSpace(
-                  0,
-                  width * 0.02,
-                ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                          text: 'Sign In ',
-                          style: textTheme.bodyMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
-                      TextSpan(
-                          text: 'Already a Customer? ',
-                          style: textTheme.bodyMedium)
-                    ],
-                  ),
-                ),
-              ],
+          ),
+          Expanded(
+            child: _AuthToggleTab(
+              label: 'Create account',
+              selected: !inLogin,
+              onTap: onSelectCreateAccount,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AuthToggleTab extends StatelessWidget {
+  const _AuthToggleTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? colorScheme.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: colorScheme.shadow.withValues(alpha: 0.08),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: textTheme.titleMedium?.copyWith(
+            color:
+                selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
       ),
     );
   }
@@ -598,10 +431,12 @@ class CommonAuthButton extends StatelessWidget {
       {super.key,
       required this.title,
       required this.onPressed,
-      required this.btnWidth});
+      required this.btnWidth,
+      this.isLoading = false});
   final String title;
   final VoidCallback onPressed;
   final double btnWidth;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -609,12 +444,21 @@ class CommonAuthButton extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final textTheme = Theme.of(context).textTheme;
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: Size(width * btnWidth, height * 0.06),
         backgroundColor: amber,
       ),
-      child: Text('Continue', style: textTheme.displaySmall),
+      child: isLoading
+          ? SizedBox(
+              height: height * 0.025,
+              width: height * 0.025,
+              child: const CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.black,
+              ),
+            )
+          : Text(title, style: textTheme.displaySmall),
     );
   }
 }

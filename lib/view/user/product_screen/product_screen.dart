@@ -160,10 +160,19 @@ class _ProductScreenState extends State<ProductScreen> {
                     builder: (BuildContext context) {
                       return Container(
                         width: MediaQuery.of(context).size.width,
-                        // margin: EdgeInsets.symmetric(horizontal: 5.0),
-
                         decoration: BoxDecoration(
-                          // color: Colors.amber,
+                          color: white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .shadow
+                                  .withValues(alpha: 0.1),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                           image: DecorationImage(
                             image: NetworkImage(i),
                             fit: BoxFit.contain,
@@ -181,9 +190,13 @@ class _ProductScreenState extends State<ProductScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Brand: ${widget.productModel.brandName}',
-                    style: textTheme.labelMedium!.copyWith(color: teal),
+                  Flexible(
+                    child: Text(
+                      'Brand: ${widget.productModel.brandName}',
+                      style: textTheme.labelMedium!.copyWith(color: teal),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
                   StreamBuilder(
                       stream: RatingServices.fetchReview(
@@ -387,17 +400,17 @@ class _ProductScreenState extends State<ProductScreen> {
                     ),
                     TextSpan(
                       text:
-                          '\t\t₹ ${widget.productModel.price!.toStringAsFixed(0)}',
+                          '\t\t₹ ${widget.productModel.discountedPrice!.toStringAsFixed(0)}',
                       style: textTheme.displayLarge!.copyWith(
                         color: black,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
                 ),
               ),
               Text(
-                'M.R.P: ₹ ${widget.productModel.price}',
+                'M.R.P: ₹ ${widget.productModel.price!.toStringAsFixed(0)}',
                 style: textTheme.labelMedium!.copyWith(
                     color: grey, decoration: TextDecoration.lineThrough),
               ),
@@ -405,7 +418,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 height * 0.02,
                 0,
               ),
-              ElevatedButton(
+              OutlinedButton.icon(
                 onPressed: () async {
                   UserProductModel model = UserProductModel(
                     imagesURL: widget.productModel.imagesURL,
@@ -428,22 +441,11 @@ class _ProductScreenState extends State<ProductScreen> {
                   await UsersProductService.addProductToCart(
                       context: context, productModel: model);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: amber,
-                  minimumSize: Size(
-                    width,
-                    height * 0.06,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      50,
-                    ),
-                  ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size(width, height * 0.06),
                 ),
-                child: Text(
-                  'Add to Cart',
-                  style: textTheme.bodyMedium!.copyWith(color: black),
-                ),
+                icon: const Icon(Icons.add_shopping_cart_outlined),
+                label: const Text('Add to Cart'),
               ),
               CommonFunctions.blankSpace(
                 height * 0.01,
@@ -452,21 +454,9 @@ class _ProductScreenState extends State<ProductScreen> {
               ElevatedButton(
                 onPressed: executePayment,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: orange,
-                  minimumSize: Size(
-                    width,
-                    height * 0.06,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      50,
-                    ),
-                  ),
+                  minimumSize: Size(width, height * 0.06),
                 ),
-                child: Text(
-                  'Buy Now',
-                  style: textTheme.bodyMedium!.copyWith(color: black),
-                ),
+                child: const Text('Buy Now'),
               ),
               CommonFunctions.blankSpace(
                 height * 0.02,
@@ -604,17 +594,20 @@ class _ProductScreenState extends State<ProductScreen> {
                               height: height * 0.1,
                               width: width,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  10,
-                                ),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerLow,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: grey),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
-                                    Icons.add_circle_outline,
+                                    Icons.add_photo_alternate_outlined,
                                     color: grey,
                                   ),
+                                  CommonFunctions.blankSpace(0, width * 0.02),
                                   Text(
                                     'Add Images',
                                     style: textTheme.bodyMedium!
@@ -680,43 +673,9 @@ class _ProductScreenState extends State<ProductScreen> {
                       ),
                       TextField(
                         controller: reviewTextController,
-                        decoration: InputDecoration(
+                        maxLines: 3,
+                        decoration: const InputDecoration(
                           hintText: 'Review here',
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: width * 0.03,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
-                            borderSide: BorderSide(
-                              color: grey,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
-                            borderSide: BorderSide(
-                              color: amber,
-                            ),
-                          ),
                         ),
                       ),
                       CommonFunctions.blankSpace(
@@ -787,21 +746,9 @@ class _ProductScreenState extends State<ProductScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          minimumSize: Size(
-                            width,
-                            height * 0.05,
-                          ),
-                          backgroundColor: amber,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
-                          ),
+                          minimumSize: Size(width, height * 0.05),
                         ),
-                        child: Text(
-                          'Submit Review',
-                          style: textTheme.bodyMedium,
-                        ),
+                        child: const Text('Submit Review'),
                       ),
                       CommonFunctions.blankSpace(
                         height * 0.03,
