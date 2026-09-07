@@ -140,29 +140,33 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           ),
                           child: Column(
                             children: [
-                              CarouselSlider(
-                                options: CarouselOptions(
-                                  height: height * 0.2,
-                                  autoPlay: false,
-                                  viewportFraction: 1,
-                                ),
-                                items: currentModel.imagesURL!.map((i) {
-                                  return Builder(
-                                    builder: (BuildContext context) {
-                                      return Container(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        decoration: BoxDecoration(
-                                          color: white,
-                                          image: DecorationImage(
-                                            image: NetworkImage(i),
-                                            fit: BoxFit.contain,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: CarouselSlider(
+                                  options: CarouselOptions(
+                                    height: height * 0.2,
+                                    autoPlay: false,
+                                    viewportFraction: 1,
+                                  ),
+                                  items: currentModel.imagesURL!.map((i) {
+                                    return Builder(
+                                      builder: (BuildContext context) {
+                                        return Container(
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width,
+                                          decoration: BoxDecoration(
+                                            color: white,
+                                            image: DecorationImage(
+                                              image: NetworkImage(i),
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                }).toList(),
+                                        );
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
                               ),
                               const Spacer(),
                               Row(

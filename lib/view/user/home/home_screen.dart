@@ -352,12 +352,22 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                 style: textTheme.bodyMedium,
               ),
             );
+          } else if (dealOfTheDayProvider.deals.isEmpty) {
+            return Container(
+              height: height * 0.2,
+              width: width,
+              alignment: Alignment.center,
+              child: Text(
+                'No deals available right now — check back soon!',
+                style: textTheme.bodyMedium,
+              ),
+            );
           } else {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${dealOfTheDayProvider.deals[3].discountPercentage}%-${dealOfTheDayProvider.deals[0].discountPercentage}% off | Latest deals.',
+                  '${dealOfTheDayProvider.deals.last.discountPercentage}%-${dealOfTheDayProvider.deals.first.discountPercentage}% off | Latest deals.',
                   style: textTheme.displaySmall!.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -529,7 +539,7 @@ class HomeScreenCategoriesList extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final textTheme = Theme.of(context).textTheme;
     return SizedBox(
-      height: height * 0.09,
+      height: height * 0.12,
       width: width,
       child: ListView.builder(
         itemCount: categories.length,

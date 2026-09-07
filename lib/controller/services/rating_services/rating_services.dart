@@ -1,9 +1,9 @@
 // ignore_for_file: use_build_context_synchronously, avoid_function_literals_in_foreach_calls
 
 import 'dart:developer';
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:amazon/controller/provier/rating_provider/rating_provider.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:amazon/controller/services/imgbb_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +14,7 @@ import '../../../model/review_model.dart';
 
 class RatingServices {
   static Future getImages({required BuildContext context}) async {
-    List<File> selectedImages = [];
+    List<Uint8List> selectedImages = [];
     final pickedFile = await picker.pickMultiImage(
       imageQuality: 100,
     );
@@ -22,33 +22,44 @@ class RatingServices {
 
     if (filePick.isNotEmpty) {
       for (var i = 0; i < filePick.length; i++) {
-        selectedImages.add(File(filePick[i].path));
+        selectedImages.add(await filePick[i].readAsBytes());
       }
     } else {
       CommonFunctions.showWarningToast(
           context: context, message: 'No Image Selected');
     }
-    log('The Images are \n${selectedImages.toList().toString()}');
+    log('The Images are \n${selectedImages.length} image(s) selected');
     return selectedImages;
   }
 
-  static uploadImageToFirebaseStorage({
-    required List<File> images,
+  static Future<bool> uploadImages({
+    required List<Uint8List> images,
     required BuildContext context,
   }) async {
     List<String> imagesURL = [];
-    String sellerUID = auth.currentUser!.phoneNumber!;
-    Uuid uuid = const Uuid();
 
-    await Future.forEach(images, (image) async {
-      String imageName = '$sellerUID${uuid.v1().toString()}';
-      Reference ref = storage.ref().child('Product_Images').child(imageName);
-      await ref.putFile(File(image.path));
-      String imageURL = await ref.getDownloadURL();
+    for (var i = 0; i < images.length; i++) {
+      if (images[i].lengthInBytes > ImgBBService.maxImageSizeBytes) {
+        CommonFunctions.showErrorToast(
+          context: context,
+          message:
+              'Opps! Image ${i + 1} of ${images.length} is too large (max 10MB)',
+        );
+        return false;
+      }
+      final imageURL = await ImgBBService.uploadImageBytes(images[i]);
+      if (imageURL == null) {
+        CommonFunctions.showErrorToast(
+          context: context,
+          message: 'Opps! Failed to upload image ${i + 1} of ${images.length}',
+        );
+        return false;
+      }
       imagesURL.add(imageURL);
-    });
+    }
 
     context.read<RatingProvider>().updateProductImagesURL(imageURLs: imagesURL);
+    return true;
   }
 
   static Future checkUserPurchasedTheProduct(

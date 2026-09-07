@@ -1,12 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/constants/constants.dart';
 import 'package:amazon/controller/provier/product_provider/product_provider.dart';
 import 'package:amazon/model/product_model.dart';
 import 'package:amazon/view/seller/add_product_screen/widget/product_details_common_text_field.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -45,49 +44,70 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   onPressed() async {
-    if (context.read<SellerProductProvider>().productImages.isNotEmpty) {
-      setState(() {
-        addProductBtnPressed = true;
-      });
-      await ProductServices.uploadImageToFirebaseStorage(
-          images: context.read<SellerProductProvider>().productImages,
-          context: context);
-      List<String> imagesURLs =
-          context.read<SellerProductProvider>().productImagesURL;
-      Uuid uuid = const Uuid();
-      String sellerID = auth.currentUser!.phoneNumber!;
-      String productID = '$sellerID${uuid.v1()}';
-      double discountAmount = double.parse(productPriceController.text.trim()) -
-          double.parse(discountedProductPriceController.text.trim());
-      double discountPercentage =
-          (discountAmount / double.parse(productPriceController.text.trim())) *
-              100;
-      ProductModel model = ProductModel(
-        imagesURL: imagesURLs,
-        name: productNameController.text.trim(),
-        category: dropDownValue,
-        description: productDescriptionController.text.trim(),
-        brandName: brandNameController.text.trim(),
-        manufacturerName: manufacturerNameController.text.trim(),
-        countryOfOrigin: countryOfOriginController.text.trim(),
-        specifications: productSpecificationsController.text.trim(),
-        price: double.parse(productPriceController.text.trim()),
-        discountedPrice:
-            double.parse(discountedProductPriceController.text.trim()),
-        productID: productID,
-        productSellerID: sellerID,
-        inStock: true,
-        uploadedAt: DateTime.now(),
-        discountPercentage: int.parse(
-          discountPercentage.toStringAsFixed(
-            0,
-          ),
-        ),
-      );
+    if (context.read<SellerProductProvider>().productImages.isEmpty) {
+      return;
+    }
+    if (dropDownValue == 'Select Category') {
+      CommonFunctions.showWarningToast(
+          context: context, message: 'Please select a category');
+      return;
+    }
+    final price = double.tryParse(productPriceController.text.trim());
+    final discountedPrice =
+        double.tryParse(discountedProductPriceController.text.trim());
+    if (price == null || discountedPrice == null || price <= 0) {
+      CommonFunctions.showWarningToast(
+          context: context, message: 'Please enter valid prices');
+      return;
+    }
 
-      await ProductServices.addProduct(context: context, productModel: model);
-      CommonFunctions.showSuccessToast(
-          context: context, message: 'Product Added Successful');
+    setState(() {
+      addProductBtnPressed = true;
+    });
+    final uploadSuccess = await ProductServices.uploadImages(
+        images: context.read<SellerProductProvider>().productImages,
+        context: context);
+    if (!uploadSuccess) {
+      setState(() {
+        addProductBtnPressed = false;
+      });
+      return;
+    }
+    List<String> imagesURLs =
+        context.read<SellerProductProvider>().productImagesURL;
+    Uuid uuid = const Uuid();
+    String sellerID = auth.currentUser!.phoneNumber!;
+    String productID = '$sellerID${uuid.v1()}';
+    double discountAmount = price - discountedPrice;
+    double discountPercentage = (discountAmount / price) * 100;
+    ProductModel model = ProductModel(
+      imagesURL: imagesURLs,
+      name: productNameController.text.trim(),
+      category: dropDownValue,
+      description: productDescriptionController.text.trim(),
+      brandName: brandNameController.text.trim(),
+      manufacturerName: manufacturerNameController.text.trim(),
+      countryOfOrigin: countryOfOriginController.text.trim(),
+      specifications: productSpecificationsController.text.trim(),
+      price: price,
+      discountedPrice: discountedPrice,
+      productID: productID,
+      productSellerID: sellerID,
+      inStock: true,
+      uploadedAt: DateTime.now(),
+      discountPercentage: int.parse(
+        discountPercentage.toStringAsFixed(
+          0,
+        ),
+      ),
+    );
+
+    final addSuccess = await ProductServices.addProduct(
+        context: context, productModel: model);
+    if (!addSuccess) {
+      setState(() {
+        addProductBtnPressed = false;
+      });
     }
   }
 
@@ -342,41 +362,85 @@ class ProductImageBanner extends StatelessWidget {
             ),
           );
         } else {
-          List<File> images =
-              context.read<SellerProductProvider>().productImages;
-          return Container(
-            height: height * 0.23,
+          List<Uint8List> images = productProvider.productImages;
+          final double thumbnailSize = height * 0.23;
+          return SizedBox(
+            height: thumbnailSize,
             width: width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: greyShade3,
-              ),
-            ),
-            padding: const EdgeInsets.all(5),
-            child: CarouselSlider(
-              carouselController: CarouselSliderController(),
-              options: CarouselOptions(
-                height: height * 0.23,
-                autoPlay: true,
-                viewportFraction: 1,
-              ),
-              items: images.map((i) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: images.length + 1,
+              itemBuilder: (context, index) {
+                if (index == images.length) {
+                  return InkWell(
+                    onTap: () {
+                      context
+                          .read<SellerProductProvider>()
+                          .fetchProductImagesFromGallery(context: context);
+                    },
+                    child: Container(
+                      height: thumbnailSize,
+                      width: thumbnailSize,
                       decoration: BoxDecoration(
-                        color: white,
-                        image: DecorationImage(
-                          image: FileImage(File(i.path)),
-                          fit: BoxFit.contain,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: greyShade3,
                         ),
                       ),
-                    );
-                  },
+                      child: Icon(
+                        Icons.add,
+                        size: height * 0.06,
+                        color: greyShade3,
+                      ),
+                    ),
+                  );
+                }
+                return Padding(
+                  padding: EdgeInsets.only(right: width * 0.02),
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: thumbnailSize,
+                        width: thumbnailSize,
+                        decoration: BoxDecoration(
+                          color: white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: greyShade3,
+                          ),
+                          image: DecorationImage(
+                            image: MemoryImage(images[index]),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: InkWell(
+                          onTap: () {
+                            context
+                                .read<SellerProductProvider>()
+                                .removeProductImage(index);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: black38,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              size: height * 0.025,
+                              color: white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
-              }).toList(),
+              },
             ),
           );
         }

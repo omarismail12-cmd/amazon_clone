@@ -1,10 +1,10 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:amazon/controller/services/rating_services/rating_services.dart';
 import 'package:flutter/material.dart';
 
 class RatingProvider extends ChangeNotifier {
-  List<File> productImages = [];
+  List<Uint8List> productImages = [];
   List<String> productImagesURL = [];
   bool productPurchased = false;
   bool userRatedTheProduct = false;

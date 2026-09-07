@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:motion_toast/motion_toast.dart';
-import 'package:motion_toast/resources/arrays.dart';
 
 import '../utils/colors.dart';
 
@@ -25,7 +24,7 @@ class CommonFunctions {
     return MotionToast.success(
       title: const Text('Success'),
       description: Text(message),
-      position: MotionToastPosition.top,
+      toastAlignment: Alignment.topCenter,
     ).show(context);
   }
 
@@ -34,7 +33,7 @@ class CommonFunctions {
     return MotionToast.error(
       title: const Text('Error'),
       description: Text(message),
-      position: MotionToastPosition.top,
+      toastAlignment: Alignment.topCenter,
     ).show(context);
   }
 
@@ -43,7 +42,7 @@ class CommonFunctions {
     return MotionToast.warning(
       title: const Text('Opps!'),
       description: Text(message),
-      position: MotionToastPosition.top,
+      toastAlignment: Alignment.topCenter,
     ).show(context);
   }
 }

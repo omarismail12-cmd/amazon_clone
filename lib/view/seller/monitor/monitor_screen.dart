@@ -18,11 +18,27 @@ class MonitorScreen extends StatefulWidget {
 }
 
 class _MonitorScreenState extends State<MonitorScreen> {
+  bool salesCheckLoading = true;
+  bool hasAnySales = false;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SellerProductProvider>().fecthSellerProducts();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<SellerProductProvider>().fecthSellerProducts();
+      if (!mounted) return;
+      final productIDs = context
+          .read<SellerProductProvider>()
+          .products
+          .map((product) => product.productID!)
+          .toList();
+      final salesFound =
+          await ProductServices.sellerHasAnySales(productIDs: productIDs);
+      if (!mounted) return;
+      setState(() {
+        hasAnySales = salesFound;
+        salesCheckLoading = false;
+      });
     });
   }
 
@@ -102,7 +118,8 @@ class _MonitorScreenState extends State<MonitorScreen> {
               children: [
                 Consumer<SellerProductProvider>(
                     builder: (context, sellerProductProvider, child) {
-                  if (sellerProductProvider.sellerProductsFetched == false) {
+                  if (sellerProductProvider.sellerProductsFetched == false ||
+                      salesCheckLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -110,6 +127,14 @@ class _MonitorScreenState extends State<MonitorScreen> {
                     return Center(
                       child: Text(
                         'No Products Found',
+                        style: textTheme.bodyMedium,
+                      ),
+                    );
+                  } else if (!hasAnySales) {
+                    return Center(
+                      child: Text(
+                        'No sales yet — sell your first product to see stats here',
+                        textAlign: TextAlign.center,
                         style: textTheme.bodyMedium,
                       ),
                     );
@@ -150,31 +175,38 @@ class _MonitorScreenState extends State<MonitorScreen> {
                                     ),
                                     child: Column(
                                       children: [
-                                        CarouselSlider(
-                                          options: CarouselOptions(
-                                            height: height * 0.2,
-                                            autoPlay: false,
-                                            viewportFraction: 1,
-                                          ),
-                                          items:
-                                              currentModel.imagesURL!.map((i) {
-                                            return Builder(
-                                              builder: (BuildContext context) {
-                                                return Container(
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  decoration: BoxDecoration(
-                                                    color: white,
-                                                    image: DecorationImage(
-                                                      image: NetworkImage(i),
-                                                      fit: BoxFit.contain,
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: CarouselSlider(
+                                            options: CarouselOptions(
+                                              height: height * 0.2,
+                                              autoPlay: false,
+                                              viewportFraction: 1,
+                                            ),
+                                            items: currentModel.imagesURL!
+                                                .map((i) {
+                                              return Builder(
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Container(
+                                                    width: MediaQuery.of(
+                                                            context)
+                                                        .size
+                                                        .width,
+                                                    decoration: BoxDecoration(
+                                                      color: white,
+                                                      image: DecorationImage(
+                                                        image:
+                                                            NetworkImage(i),
+                                                        fit: BoxFit.cover,
+                                                      ),
                                                     ),
-                                                  ),
-                                                );
-                                              },
-                                            );
-                                          }).toList(),
+                                                  );
+                                                },
+                                              );
+                                            }).toList(),
+                                          ),
                                         ),
                                         const Spacer(),
                                         Row(

@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'dart:developer';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/constants/constants.dart';
@@ -618,7 +618,7 @@ class _ProductScreenState extends State<ProductScreen> {
                             ),
                           );
                         } else {
-                          List<File> productImages =
+                          List<Uint8List> productImages =
                               productRating.productImages;
                           return GridView.builder(
                             shrinkWrap: true,
@@ -631,10 +631,8 @@ class _ProductScreenState extends State<ProductScreen> {
                             ),
                             itemBuilder: (context, index) {
                               return Image(
-                                image: FileImage(
-                                  File(
-                                    productImages[index].path,
-                                  ),
+                                image: MemoryImage(
+                                  productImages[index],
                                 ),
                                 fit: BoxFit.contain,
                               );
@@ -690,12 +688,16 @@ class _ProductScreenState extends State<ProductScreen> {
                                 .read<RatingProvider>()
                                 .productImages
                                 .isNotEmpty) {
-                              await RatingServices.uploadImageToFirebaseStorage(
+                              final uploadSuccess =
+                                  await RatingServices.uploadImages(
                                 images: context
                                     .read<RatingProvider>()
                                     .productImages,
                                 context: context,
                               );
+                              if (!uploadSuccess) {
+                                return;
+                              }
 
                               ReviewModel reviewModel = ReviewModel(
                                 rating: usersRating,

@@ -2,7 +2,8 @@
 
 import 'dart:developer';
 
-import 'package:amazon/controller/provier/auth_provider/auth_provider.dart';
+import 'package:amazon/controller/provier/auth_provider/auth_provider.dart'
+    as app_provider;
 import 'package:amazon/view/auth_screen/otp_screen.dart';
 import 'package:amazon/view/auth_screen/sign_in_logic.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,9 +35,9 @@ class AuthServices {
         },
         codeSent: (String verificationID, int? resendToken) {
           context
-              .read<AuthProvider>()
+              .read<app_provider.AuthProvider>()
               .upDateverificationId(verID: verificationID);
-          context.read<AuthProvider>().upDatePhoneNum(
+          context.read<app_provider.AuthProvider>().upDatePhoneNum(
                 num: mobileNo,
               );
           Navigator.push(
@@ -58,7 +59,7 @@ class AuthServices {
     FirebaseAuth auth = FirebaseAuth.instance;
     try {
       AuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: context.read<AuthProvider>().verificationId,
+        verificationId: context.read<app_provider.AuthProvider>().verificationId,
         smsCode: otp,
       );
       await auth.signInWithCredential(credential);
