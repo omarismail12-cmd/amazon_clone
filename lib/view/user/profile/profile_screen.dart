@@ -3,8 +3,6 @@ import 'package:amazon/controller/services/users_product_services/users_product_
 import 'package:amazon/model/product_model.dart';
 import 'package:amazon/model/user_product_model.dart';
 import 'package:amazon/utils/colors.dart';
-import 'package:amazon/view/common_widgets/empty_state.dart';
-import 'package:amazon/view/common_widgets/section_header.dart';
 import 'package:amazon/view/user/orders_screen/orders_screen.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
 import 'package:flutter/material.dart';
@@ -124,10 +122,22 @@ class KeepShopping extends StatelessWidget {
           horizontal: width * 0.04, vertical: height * 0.01),
       child: Column(
         children: [
-          SectionHeader(
-            title: 'Keep Shopping for',
-            actionLabel: 'Browsing history',
-            onAction: () {},
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Keep Shopping for',
+                style: textTheme.bodyLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'Browsing history',
+                style: textTheme.bodySmall!.copyWith(
+                  color: blue,
+                ),
+              ),
+            ],
           ),
           CommonFunctions.blankSpace(
             height * 0.02,
@@ -137,9 +147,14 @@ class KeepShopping extends StatelessWidget {
               stream: UsersProductService.fetchKeepShoppingForProducts(),
               builder: (context, snapshot) {
                 if (snapshot.data!.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.history,
-                    message: 'Start browsing for products.',
+                  return Container(
+                    height: height * 0.15,
+                    width: width,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Start Browsing for Products',
+                      style: textTheme.bodyMedium,
+                    ),
                   );
                 }
 
@@ -172,21 +187,20 @@ class KeepShopping extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: greyShade3,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: greyShade3,
                                     ),
-                                    child: Image(
-                                      image: NetworkImage(
-                                        currentProduct.imagesURL![0],
-                                      ),
-                                      fit: BoxFit.contain,
+                                    borderRadius: BorderRadius.circular(
+                                      10,
                                     ),
+                                  ),
+                                  child: Image(
+                                    image: NetworkImage(
+                                      currentProduct.imagesURL![0],
+                                    ),
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
@@ -202,14 +216,24 @@ class KeepShopping extends StatelessWidget {
                       });
                 }
                 if (snapshot.hasError) {
-                  return const EmptyState(
-                    icon: Icons.error_outline,
-                    message: 'Opps! There was an Error',
+                  return Container(
+                    height: height * 0.15,
+                    width: width,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Opps! There was an Error',
+                      style: textTheme.bodyMedium,
+                    ),
                   );
                 } else {
-                  return const EmptyState(
-                    icon: Icons.search_off,
-                    message: 'Opps! No Product Found',
+                  return Container(
+                    height: height * 0.15,
+                    width: width,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Opps! No Product Found',
+                      style: textTheme.bodyMedium,
+                    ),
                   );
                 }
               }),
@@ -238,10 +262,22 @@ class BuyAgain extends StatelessWidget {
           horizontal: width * 0.04, vertical: height * 0.01),
       child: Column(
         children: [
-          SectionHeader(
-            title: 'Buy Again',
-            actionLabel: 'See all',
-            onAction: () {},
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Buy Again',
+                style: textTheme.bodyLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'See all',
+                style: textTheme.bodySmall!.copyWith(
+                  color: blue,
+                ),
+              ),
+            ],
           ),
           CommonFunctions.blankSpace(
             height * 0.02,
@@ -264,7 +300,7 @@ class BuyAgain extends StatelessWidget {
                           color: greyShade3,
                         ),
                         borderRadius: BorderRadius.circular(
-                          12,
+                          10,
                         ),
                       ),
                     );
@@ -294,9 +330,14 @@ class UsersOrders extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data!.isEmpty) {
-              return const EmptyState(
-                icon: Icons.receipt_long_outlined,
-                message: 'You haven\'t ordered anything yet.',
+              return Container(
+                height: height * 0.2,
+                width: width,
+                alignment: Alignment.center,
+                child: Text(
+                  'Opps! Your didnt order anything yet',
+                  style: textTheme.displayMedium,
+                ),
               );
             } else {
               List<UserProductModel> orders = snapshot.data!;
@@ -305,10 +346,22 @@ class UsersOrders extends StatelessWidget {
                     horizontal: width * 0.04, vertical: height * 0.01),
                 child: Column(
                   children: [
-                    SectionHeader(
-                      title: 'Your Orders',
-                      actionLabel: 'See all',
-                      onAction: () {},
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Your Orders',
+                          style: textTheme.bodyLarge!.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'See all',
+                          style: textTheme.bodySmall!.copyWith(
+                            color: blue,
+                          ),
+                        ),
+                      ],
                     ),
                     CommonFunctions.blankSpace(
                       height * 0.02,
@@ -368,7 +421,7 @@ class UsersOrders extends StatelessWidget {
                                       color: greyShade3,
                                     ),
                                     borderRadius: BorderRadius.circular(
-                                      12,
+                                      10,
                                     ),
                                   ),
                                   child: Image(
@@ -385,17 +438,31 @@ class UsersOrders extends StatelessWidget {
             }
           }
           if (snapshot.hasError) {
-            return const EmptyState(
-              icon: Icons.error_outline,
-              message: 'Opps! There was an error',
+            return Container(
+              height: height * 0.2,
+              width: width,
+              alignment: Alignment.center,
+              child: Text(
+                'Opps! There Was An error',
+                style: textTheme.displayMedium,
+              ),
             );
           } else {
-            return const EmptyState(
-              icon: Icons.receipt_long_outlined,
-              message: 'Opps! No order found',
+            return Container(
+              height: height * 0.2,
+              width: width,
+              alignment: Alignment.center,
+              child: Text(
+                'Opps! No Order Found',
+                style: textTheme.displayMedium,
+              ),
             );
           }
         });
+
+    // return
+
+    //
   }
 }
 

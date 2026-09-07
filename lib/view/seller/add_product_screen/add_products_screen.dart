@@ -5,7 +5,6 @@ import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/constants/constants.dart';
 import 'package:amazon/controller/provier/product_provider/product_provider.dart';
 import 'package:amazon/model/product_model.dart';
-import 'package:amazon/view/common_widgets/app_buttons.dart';
 import 'package:amazon/view/seller/add_product_screen/widget/product_details_common_text_field.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -115,19 +114,25 @@ class _AddProductScreenState extends State<AddProductScreen> {
               ProductImageBanner(
                   height: height, width: width, textTheme: textTheme),
               CommonFunctions.blankSpace(height * 0.02, 0),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: productDetails(height, textTheme, width),
-                ),
-              ),
+              productDetails(height, textTheme, width),
               CommonFunctions.blankSpace(height * 0.03, 0),
-              PrimaryButton(
-                label: 'Add Product',
-                isLoading: addProductBtnPressed,
-                minimumSize: Size(width, height * 0.06),
-                onPressed: onPressed,
-              ),
+              ElevatedButton(
+                  onPressed: onPressed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: amber,
+                    minimumSize: Size(
+                      width,
+                      height * 0.06,
+                    ),
+                  ),
+                  child: addProductBtnPressed
+                      ? CircularProgressIndicator(
+                          color: white,
+                        )
+                      : Text(
+                          'Add Product',
+                          style: textTheme.bodyMedium,
+                        )),
               CommonFunctions.blankSpace(height * 0.03, 0),
             ],
           ),
@@ -211,7 +216,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
           height: height * 0.06,
           padding: EdgeInsets.symmetric(horizontal: width * 0.03),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(
+              10,
+            ),
             border: Border.all(
               color: grey,
             ),
@@ -311,7 +318,7 @@ class ProductImageBanner extends StatelessWidget {
               height: height * 0.23,
               width: width,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: greyShade3,
                 ),
@@ -341,7 +348,7 @@ class ProductImageBanner extends StatelessWidget {
             height: height * 0.23,
             width: width,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: greyShade3,
               ),

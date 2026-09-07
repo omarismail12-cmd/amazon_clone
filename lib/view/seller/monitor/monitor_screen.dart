@@ -2,8 +2,6 @@ import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/provier/product_provider/product_provider.dart';
 import 'package:amazon/controller/services/product_services/product_services.dart';
 import 'package:amazon/model/product_model.dart';
-import 'package:amazon/view/common_widgets/empty_state.dart';
-import 'package:amazon/view/common_widgets/shimmer_box.dart';
 import 'package:amazon/view/seller/add_product_screen/add_products_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -105,23 +103,15 @@ class _MonitorScreenState extends State<MonitorScreen> {
                 Consumer<SellerProductProvider>(
                     builder: (context, sellerProductProvider, child) {
                   if (sellerProductProvider.sellerProductsFetched == false) {
-                    return ListView.builder(
-                      itemCount: 3,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) => Padding(
-                        padding: EdgeInsets.symmetric(vertical: height * 0.01),
-                        child: ShimmerBox(
-                          width: width,
-                          height: height * 0.3,
-                          borderRadius: 16,
-                        ),
-                      ),
+                    return const Center(
+                      child: CircularProgressIndicator(),
                     );
                   } else if (sellerProductProvider.products.isEmpty) {
-                    return const EmptyState(
-                      icon: Icons.bar_chart_outlined,
-                      message: 'No products found.',
+                    return Center(
+                      child: Text(
+                        'No Products Found',
+                        style: textTheme.bodyMedium,
+                      ),
                     );
                   }
                   return ListView.builder(
@@ -140,203 +130,200 @@ class _MonitorScreenState extends State<MonitorScreen> {
                                 if (snapshot.data!.isEmpty) {
                                   return const SizedBox();
                                 } else {
-                                  return Card(
+                                  return Container(
+                                    height: height * 0.3,
+                                    width: width,
                                     margin: EdgeInsets.symmetric(
                                       vertical: height * 0.01,
                                     ),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: width * 0.02,
-                                          vertical: height * 0.01),
-                                      child: SizedBox(
-                                        height: height * 0.3,
-                                        width: width,
-                                        child: Column(
-                                          children: [
-                                            CarouselSlider(
-                                              options: CarouselOptions(
-                                                height: height * 0.2,
-                                                autoPlay: false,
-                                                viewportFraction: 1,
-                                              ),
-                                              items: currentModel.imagesURL!
-                                                  .map((i) {
-                                                return Builder(
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return Container(
-                                                      width:
-                                                          MediaQuery.of(context)
-                                                              .size
-                                                              .width,
-                                                      decoration: BoxDecoration(
-                                                        color: white,
-                                                        image: DecorationImage(
-                                                          image:
-                                                              NetworkImage(i),
-                                                          fit: BoxFit.contain,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: width * 0.02,
+                                        vertical: height * 0.01),
+                                    decoration: BoxDecoration(
+                                      color: white,
+                                      borderRadius: BorderRadius.circular(
+                                        10,
+                                      ),
+                                      border: Border.all(
+                                        color: grey,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        CarouselSlider(
+                                          options: CarouselOptions(
+                                            height: height * 0.2,
+                                            autoPlay: false,
+                                            viewportFraction: 1,
+                                          ),
+                                          items:
+                                              currentModel.imagesURL!.map((i) {
+                                            return Builder(
+                                              builder: (BuildContext context) {
+                                                return Container(
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  decoration: BoxDecoration(
+                                                    color: white,
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(i),
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                  ),
                                                 );
-                                              }).toList(),
-                                            ),
-                                            const Spacer(),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Expanded(
-                                                  flex: 7,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: [
-                                                      Text(
-                                                        currentModel.name!,
-                                                        style: textTheme
-                                                            .bodyMedium!
-                                                            .copyWith(
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                      ),
-                                                      RichText(
-                                                        text: TextSpan(
-                                                          children: [
-                                                            TextSpan(
-                                                              text: 'Revenue: ',
-                                                              style: textTheme
-                                                                  .bodySmall!,
-                                                            ),
-                                                            TextSpan(
-                                                              text: '₹ ${snapshot.data!.fold(
-                                                                    0.0,
-                                                                    (previousValue,
-                                                                            product) =>
-                                                                        previousValue +
-                                                                        (product.productCount! *
-                                                                            product.discountedPrice!),
-                                                                  ).toStringAsFixed(0)}',
-
-                                                              // textAlign: TextAlign.justify,
-                                                              // maxLines: 2,
-                                                              style: textTheme
-                                                                  .bodySmall!
-                                                                  .copyWith(
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      RichText(
-                                                        text: TextSpan(
-                                                          children: [
-                                                            TextSpan(
-                                                              text: 'Qty: ',
-                                                              style: textTheme
-                                                                  .bodySmall!,
-                                                            ),
-                                                            TextSpan(
-                                                              text: snapshot
-                                                                  .data!
-                                                                  .fold(
-                                                                    0.0,
-                                                                    (previousValue,
-                                                                            product) =>
-                                                                        previousValue +
-                                                                        (product
-                                                                            .productCount!),
-                                                                  )
-                                                                  .toStringAsFixed(
-                                                                      0),
-
-                                                              // textAlign: TextAlign.justify,
-                                                              // maxLines: 2,
-                                                              style: textTheme
-                                                                  .bodySmall!
-                                                                  .copyWith(
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
+                                              },
+                                            );
+                                          }).toList(),
+                                        ),
+                                        const Spacer(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              flex: 7,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  Text(
+                                                    currentModel.name!,
+                                                    style: textTheme.bodyMedium!
+                                                        .copyWith(
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
                                                   ),
-                                                ),
-                                                CommonFunctions.blankSpace(
-                                                  0,
-                                                  width * 0.02,
-                                                ),
-                                                Expanded(
-                                                  flex: 3,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: [
-                                                      Text(
-                                                        '₹ ${currentModel.discountedPrice.toString()}',
-                                                        style: textTheme
-                                                            .bodyMedium,
-                                                      ),
-                                                      Text(
-                                                        '₹ ${currentModel.price.toString()}',
-                                                        style: textTheme
-                                                            .labelMedium!
-                                                            .copyWith(
-                                                                color: grey,
-                                                                decoration:
-                                                                    TextDecoration
-                                                                        .lineThrough),
-                                                      ),
-                                                      Text(
-                                                        currentModel.inStock!
-                                                            ? 'in Stock'
-                                                            : 'Out of Stock',
-                                                        style: textTheme
-                                                            .bodySmall!
-                                                            .copyWith(
-                                                                color: currentModel
-                                                                        .inStock!
-                                                                    ? teal
-                                                                    : red),
-                                                      ),
-                                                    ],
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: 'Revenue: ',
+                                                          style: textTheme
+                                                              .bodySmall!,
+                                                        ),
+                                                        TextSpan(
+                                                          text: '₹ ${snapshot.data!.fold(
+                                                                0.0,
+                                                                (previousValue,
+                                                                        product) =>
+                                                                    previousValue +
+                                                                    (product.productCount! *
+                                                                        product
+                                                                            .discountedPrice!),
+                                                              ).toStringAsFixed(0)}',
+
+                                                          // textAlign: TextAlign.justify,
+                                                          // maxLines: 2,
+                                                          style: textTheme
+                                                              .bodySmall!
+                                                              .copyWith(
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                )
-                                              ],
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: 'Qty: ',
+                                                          style: textTheme
+                                                              .bodySmall!,
+                                                        ),
+                                                        TextSpan(
+                                                          text: snapshot.data!
+                                                              .fold(
+                                                                0.0,
+                                                                (previousValue,
+                                                                        product) =>
+                                                                    previousValue +
+                                                                    (product
+                                                                        .productCount!),
+                                                              )
+                                                              .toStringAsFixed(
+                                                                  0),
+
+                                                          // textAlign: TextAlign.justify,
+                                                          // maxLines: 2,
+                                                          style: textTheme
+                                                              .bodySmall!
+                                                              .copyWith(
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
+                                            CommonFunctions.blankSpace(
+                                              0,
+                                              width * 0.02,
+                                            ),
+                                            Expanded(
+                                              flex: 3,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  Text(
+                                                    '₹ ${currentModel.discountedPrice.toString()}',
+                                                    style: textTheme.bodyMedium,
+                                                  ),
+                                                  Text(
+                                                    '₹ ${currentModel.price.toString()}',
+                                                    style: textTheme
+                                                        .labelMedium!
+                                                        .copyWith(
+                                                            color: grey,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .lineThrough),
+                                                  ),
+                                                  Text(
+                                                    currentModel.inStock!
+                                                        ? 'in Stock'
+                                                        : 'Out of Stock',
+                                                    style: textTheme.bodySmall!
+                                                        .copyWith(
+                                                            color: currentModel
+                                                                    .inStock!
+                                                                ? teal
+                                                                : red),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
                                           ],
                                         ),
-                                      ),
+                                      ],
                                     ),
                                   );
                                 }
                               }
                               if (snapshot.hasError) {
-                                return const EmptyState(
-                                  icon: Icons.error_outline,
-                                  message:
-                                      'Opps! Error loading data, please contact admin',
+                                return Text(
+                                  'Opps! Error Loading Data, Please contact Admin',
+                                  style: textTheme.bodyMedium,
                                 );
                               } else {
                                 return const SizedBox();

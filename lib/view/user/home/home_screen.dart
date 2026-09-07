@@ -11,8 +11,6 @@ import 'package:amazon/controller/services/user_data_crud_services/user_data_CRU
 import 'package:amazon/model/address_model.dart';
 import 'package:amazon/model/product_model.dart';
 import 'package:amazon/utils/colors.dart';
-import 'package:amazon/view/common_widgets/section_header.dart';
-import 'package:amazon/view/common_widgets/shimmer_box.dart';
 import 'package:amazon/view/user/address_screen/address_screen.dart';
 import 'package:amazon/view/user/product_category_screen/product_category_screen.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
@@ -175,79 +173,72 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: PreferredSize(
           preferredSize: Size(width * 1, height * 0.1),
           child: HomePageAppBar(width: width, height: height)),
-      body: RefreshIndicator(
-        onRefresh: () => Future.wait<dynamic>([
-          context.read<AddressProvider>().getCurrentSelectedAddress(),
-          context.read<DealOfTheDayProvider>().fetchTodaysDeal(),
-        ]),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              HomeScreenUserAddressBar(height: height, width: width),
-              CommonFunctions.divider(),
-              const HomeScreenCategoriesList(),
-              CommonFunctions.blankSpace(height * 0.01, 0),
-              CommonFunctions.divider(),
-              HomeScreenBanner(height: height),
-              CommonFunctions.divider(),
-              TodaysDealHomeScreenWidget(
-                  todaysDealsCarouselController: todaysDealsCarouselController),
-              CommonFunctions.divider(),
-              otherOfferGridWidget(
-                  title: 'Latest Launces in Headphones',
-                  textBtnName: 'Explore More',
-                  productPicNamesList: headphonesDeals,
-                  offerFor: 'headphones'),
-              CommonFunctions.divider(),
-              SizedBox(
-                height: height * 0.35,
-                width: width,
-                child: const Image(
-                  image: AssetImage(
-                    'assets/images/offersNsponcered/insurance.png',
-                  ),
-                  fit: BoxFit.fill,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            HomeScreenUserAddressBar(height: height, width: width),
+            CommonFunctions.divider(),
+            const HomeScreenCategoriesList(),
+            CommonFunctions.blankSpace(height * 0.01, 0),
+            CommonFunctions.divider(),
+            HomeScreenBanner(height: height),
+            CommonFunctions.divider(),
+            TodaysDealHomeScreenWidget(
+                todaysDealsCarouselController: todaysDealsCarouselController),
+            CommonFunctions.divider(),
+            otherOfferGridWidget(
+                title: 'Latest Launces in Headphones',
+                textBtnName: 'Explore More',
+                productPicNamesList: headphonesDeals,
+                offerFor: 'headphones'),
+            CommonFunctions.divider(),
+            SizedBox(
+              height: height * 0.35,
+              width: width,
+              child: const Image(
+                image: AssetImage(
+                  'assets/images/offersNsponcered/insurance.png',
                 ),
+                fit: BoxFit.fill,
               ),
-              CommonFunctions.divider(),
-              otherOfferGridWidget(
-                  title: 'Minimum 70% Off | Top Offers on Clothing',
-                  textBtnName: 'See all deals',
-                  productPicNamesList: clothingDealsList,
-                  offerFor: 'clothing'),
-              CommonFunctions.divider(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CommonFunctions.blankSpace(height * 0.01, 0),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: width * 0.03),
-                    child: Text(
-                      'Watch Sixer only on miniTV',
-                      style: textTheme.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+            ),
+            CommonFunctions.divider(),
+            otherOfferGridWidget(
+                title: 'Minimum 70% Off | Top Offers on Clothing',
+                textBtnName: 'See all deals',
+                productPicNamesList: clothingDealsList,
+                offerFor: 'clothing'),
+            CommonFunctions.divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CommonFunctions.blankSpace(height * 0.01, 0),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+                  child: Text(
+                    'Watch Sixer only on miniTV',
+                    style: textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Container(
-                    // height: height * 0.4,
-                    width: width,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: width * 0.03,
-                      vertical: height * 0.01,
-                    ),
-                    child: const Image(
-                      image: AssetImage(
-                        'assets/images/offersNsponcered/sixer.png',
-                      ),
-                      fit: BoxFit.fill,
-                    ),
+                ),
+                Container(
+                  // height: height * 0.4,
+                  width: width,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.03,
+                    vertical: height * 0.01,
                   ),
-                ],
-              )
-            ],
-          ),
+                  child: const Image(
+                    image: AssetImage(
+                      'assets/images/offersNsponcered/sixer.png',
+                    ),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );
@@ -271,10 +262,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SectionHeader(
-              title: title,
-              actionLabel: textBtnName,
-              onAction: () {},
+            Text(
+              title,
+              style: textTheme.bodyMedium!.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             CommonFunctions.blankSpace(
               height * 0.01,
@@ -297,17 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .shadow
-                                      .withValues(alpha: 0.08),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                              borderRadius: BorderRadius.circular(10),
                               image: DecorationImage(
                                 image: AssetImage(
                                     'assets/images/offersNsponcered/${productPicNamesList[index]}'),
@@ -326,6 +308,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 }),
+            TextButton(
+              onPressed: () {},
+              child: Text(
+                textBtnName,
+                style: textTheme.bodySmall!.copyWith(
+                  color: blue,
+                ),
+              ),
+            ),
           ],
         ));
   }
@@ -352,29 +343,14 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
         child: Consumer<DealOfTheDayProvider>(
             builder: (context, dealOfTheDayProvider, child) {
           if (dealOfTheDayProvider.dealsFetched == false) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ShimmerBox(width: width * 0.6, height: height * 0.025),
-                CommonFunctions.blankSpace(height * 0.01, 0),
-                ShimmerBox(
-                  width: width,
-                  height: height * 0.2,
-                  borderRadius: 16,
-                ),
-                CommonFunctions.blankSpace(height * 0.01, 0),
-                GridView.builder(
-                  itemCount: 4,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10),
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) =>
-                      const ShimmerBox(borderRadius: 12),
-                ),
-              ],
+            return Container(
+              height: height * 0.2,
+              width: width,
+              alignment: Alignment.center,
+              child: Text(
+                'Loading Latest Deals',
+                style: textTheme.bodyMedium,
+              ),
             );
           } else {
             return Column(
@@ -413,17 +389,6 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                             width: MediaQuery.of(context).size.width,
                             decoration: BoxDecoration(
                               color: white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .shadow
-                                      .withValues(alpha: 0.1),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
                               image: DecorationImage(
                                 image:
                                     NetworkImage(currentProduct.imagesURL![0]),
@@ -536,20 +501,10 @@ class HomeScreenBanner extends StatelessWidget {
           builder: (BuildContext context) {
             return Container(
               width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              // margin: EdgeInsets.symmetric(horizontal: 5.0),
+
               decoration: BoxDecoration(
                 color: Colors.amber,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .shadow
-                        .withValues(alpha: 0.12),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
                 image: DecorationImage(
                   image: AssetImage('assets/images/carousel_slideshow/$i'),
                   fit: BoxFit.cover,
@@ -598,18 +553,11 @@ class HomeScreenCategoriesList extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(width * 0.015),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerLow,
-                      shape: BoxShape.circle,
+                  Image(
+                    image: AssetImage(
+                      'assets/images/categories/${categories[index]}.png',
                     ),
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/categories/${categories[index]}.png',
-                      ),
-                      height: height * 0.07,
-                    ),
+                    height: height * 0.07,
                   ),
                   Text(
                     categories[index],
@@ -665,13 +613,9 @@ class HomeScreenUserAddressBar extends StatelessWidget {
                 0,
                 width * 0.02,
               ),
-              Expanded(
-                child: Text(
-                  'Deliver to ${selectedAddress.name} - ${selectedAddress.town}, ${selectedAddress.state}',
-                  style: textTheme.bodySmall,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
+              Text(
+                'Deliver to ${selectedAddress.name} - ${selectedAddress.town}, ${selectedAddress.state}',
+                style: textTheme.bodySmall,
               )
             ],
           );
@@ -687,14 +631,7 @@ class HomeScreenUserAddressBar extends StatelessWidget {
                 0,
                 width * 0.02,
               ),
-              Expanded(
-                child: Text(
-                  'Deliver to user - City, State',
-                  style: textTheme.bodySmall,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              )
+              Text('Deliver to user - City, State', style: textTheme.bodySmall)
             ],
           );
         }
@@ -750,18 +687,13 @@ class HomePageAppBar extends StatelessWidget {
                 horizontal: width * 0.04,
               ),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                  5,
+                ),
+                border: Border.all(
+                  color: grey,
+                ),
                 color: white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .shadow
-                        .withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
               ),
               child: Row(
                 children: [

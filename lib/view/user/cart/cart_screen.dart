@@ -6,7 +6,6 @@ import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/user_product_model.dart';
 import 'package:amazon/utils/colors.dart';
-import 'package:amazon/view/common_widgets/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
@@ -138,9 +137,11 @@ class _CartScreenState extends State<CartScreen> {
                   stream: UsersProductService.fetchCartProducts(),
                   builder: (context, snapshot) {
                     if (snapshot.data!.isEmpty) {
-                      return const EmptyState(
-                        icon: Icons.shopping_cart_outlined,
-                        message: 'Your cart is empty.',
+                      return Center(
+                        child: Text(
+                          'Your cart is empty.',
+                          style: textTheme.bodyMedium,
+                        ),
                       );
                     }
                     if (snapshot.hasData) {
@@ -517,15 +518,18 @@ class _CartScreenState extends State<CartScreen> {
                       );
                     }
                     if (snapshot.hasError) {
-                      return const EmptyState(
-                        icon: Icons.error_outline,
-                        message:
-                            'Opps! Something went wrong loading your cart.',
+                      return Center(
+                        child: Text(
+                          'Opps! Something went wrong loading your cart.',
+                          style: textTheme.bodyMedium,
+                        ),
                       );
                     } else {
-                      return const EmptyState(
-                        icon: Icons.shopping_cart_outlined,
-                        message: 'Your cart is empty.',
+                      return Center(
+                        child: Text(
+                          'Your cart is empty.',
+                          style: textTheme.bodyMedium,
+                        ),
                       );
                     }
                   })
