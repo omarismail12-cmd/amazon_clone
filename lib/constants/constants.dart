@@ -24,7 +24,7 @@ List<String> categories = [
   'Electronics',
   'Business',
   'Home',
-  'miniTV',
+  'Grocery',
   'Mobiles',
   'Fashion',
   'Deals',
@@ -36,39 +36,6 @@ List<String> categories = [
   'Books',
   'Appliances',
   'More',
-];
-
-List<String> carouselPictures = [
-  '1.png',
-  '2.png',
-  '3.png',
-  '4.png',
-  '5.png',
-  '6.png',
-  '7.png',
-  '8.png',
-  '9.png',
-];
-
-List<String> todaysDeals = [
-  'todaysDeal0.png',
-  'todaysDeal1.png',
-  'todaysDeal2.png',
-  'todaysDeal3.png',
-];
-
-List<String> headphonesDeals = [
-  'bose.png',
-  'boat.png',
-  'sony.png',
-  'onePlus.png',
-];
-
-List<String> clothingDealsList = [
-  'kurta.png',
-  'tops.png',
-  't_shirts.png',
-  'view_all.png',
 ];
 
 List<String> productCategories = [

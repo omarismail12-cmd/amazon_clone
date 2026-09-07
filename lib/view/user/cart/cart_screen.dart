@@ -136,7 +136,17 @@ class _CartScreenState extends State<CartScreen> {
               StreamBuilder(
                   stream: UsersProductService.fetchCartProducts(),
                   builder: (context, snapshot) {
-                    if (snapshot.data!.isEmpty) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'Opps! Something went wrong loading your cart.',
+                          style: textTheme.bodyMedium,
+                        ),
+                      );
+                    }
+                    final List<UserProductModel> cartProducts =
+                        snapshot.data ?? [];
+                    if (cartProducts.isEmpty) {
                       return Center(
                         child: Text(
                           'Your cart is empty.',
@@ -144,10 +154,8 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       );
                     }
-                    if (snapshot.hasData) {
-                      List<UserProductModel> cartProducts = snapshot.data!;
-                      log(cartProducts.length.toString());
-                      return Column(
+                    log(cartProducts.length.toString());
+                    return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Card(
@@ -165,7 +173,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                         TextSpan(
                                           text:
-                                              '₹ ${cartProducts.fold(0.0, (previousValue, product) => previousValue + (product.productCount! * product.discountedPrice!)).toStringAsFixed(0)}',
+                                              '\$ ${cartProducts.fold(0.0, (previousValue, product) => previousValue + (product.productCount! * product.discountedPrice!)).toStringAsFixed(0)}',
                                           style:
                                               textTheme.displaySmall!.copyWith(
                                             fontWeight: FontWeight.bold,
@@ -434,7 +442,7 @@ class _CartScreenState extends State<CartScreen> {
                                                     WrapCrossAlignment.center,
                                                 children: [
                                                   Text(
-                                                    '₹ ${currenProduct.discountedPrice!.toStringAsFixed(0)}',
+                                                    '\$ ${currenProduct.discountedPrice!.toStringAsFixed(0)}',
                                                     style: textTheme
                                                         .displayMedium!
                                                         .copyWith(
@@ -443,7 +451,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                     .bold),
                                                   ),
                                                   Text(
-                                                    '\tMRP: ₹',
+                                                    '\tMRP: \$',
                                                     style: textTheme.bodySmall!
                                                         .copyWith(
                                                       color: grey,
@@ -483,8 +491,7 @@ class _CartScreenState extends State<CartScreen> {
                                               ),
                                               Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                    MainAxisAlignment.start,
                                                 children: [
                                                   OutlinedButton(
                                                       onPressed: () async {
@@ -498,10 +505,6 @@ class _CartScreenState extends State<CartScreen> {
                                                       },
                                                       child:
                                                           const Text('Delete')),
-                                                  OutlinedButton(
-                                                      onPressed: () {},
-                                                      child: const Text(
-                                                          'Save for Later'))
                                                 ],
                                               )
                                             ],
@@ -516,22 +519,6 @@ class _CartScreenState extends State<CartScreen> {
                           )
                         ],
                       );
-                    }
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Opps! Something went wrong loading your cart.',
-                          style: textTheme.bodyMedium,
-                        ),
-                      );
-                    } else {
-                      return Center(
-                        child: Text(
-                          'Your cart is empty.',
-                          style: textTheme.bodyMedium,
-                        ),
-                      );
-                    }
                   })
             ],
           ),

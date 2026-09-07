@@ -5,6 +5,7 @@ import 'package:amazon/model/user_product_model.dart';
 import 'package:amazon/utils/colors.dart';
 import 'package:amazon/view/user/orders_screen/orders_screen.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
+import 'package:amazon/view/user/searched_product_screen/searched_product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -47,7 +48,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const Spacer(),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    CommonFunctions.showWarningToast(
+                        context: context, message: 'No new notifications');
+                  },
                   icon: Icon(
                     Icons.notifications_none,
                     color: black,
@@ -55,7 +59,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        child: const SearchedProductScreen(),
+                        type: PageTransitionType.rightToLeft,
+                      ),
+                    );
+                  },
                   icon: Icon(
                     Icons.search,
                     color: black,
@@ -146,21 +158,30 @@ class KeepShopping extends StatelessWidget {
           StreamBuilder(
               stream: UsersProductService.fetchKeepShoppingForProducts(),
               builder: (context, snapshot) {
-                if (snapshot.data!.isEmpty) {
+                if (snapshot.hasError) {
                   return Container(
                     height: height * 0.15,
                     width: width,
                     alignment: Alignment.center,
                     child: Text(
-                      'Start Browsing for Products',
+                      'Opps! There was an Error',
                       style: textTheme.bodyMedium,
                     ),
                   );
                 }
-
-                if (snapshot.hasData) {
-                  List<ProductModel> products = snapshot.data!;
-                  return GridView.builder(
+                final List<ProductModel> products = snapshot.data ?? [];
+                if (products.isEmpty) {
+                  return Container(
+                    height: height * 0.15,
+                    width: width,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Nothing here yet — start browsing to see items here',
+                      style: textTheme.bodyMedium,
+                    ),
+                  );
+                }
+                return GridView.builder(
                       itemCount: (products.length > 6) ? 6 : products.length,
                       shrinkWrap: true,
                       physics: const PageScrollPhysics(),
@@ -214,28 +235,6 @@ class KeepShopping extends StatelessWidget {
                           ),
                         );
                       });
-                }
-                if (snapshot.hasError) {
-                  return Container(
-                    height: height * 0.15,
-                    width: width,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Opps! There was an Error',
-                      style: textTheme.bodyMedium,
-                    ),
-                  );
-                } else {
-                  return Container(
-                    height: height * 0.15,
-                    width: width,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Opps! No Product Found',
-                      style: textTheme.bodyMedium,
-                    ),
-                  );
-                }
               }),
         ],
       ),

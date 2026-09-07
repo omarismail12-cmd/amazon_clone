@@ -1,3 +1,4 @@
+import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/user_product_model.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:page_transition/page_transition.dart';
 import '../../../model/product_model.dart';
 import '../../../utils/colors.dart';
 import '../product_screen/product_screen.dart';
+import '../searched_product_screen/searched_product_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -46,7 +48,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
               ),
               const Spacer(),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  CommonFunctions.showWarningToast(
+                      context: context, message: 'No new notifications');
+                },
                 icon: Icon(
                   Icons.notifications_none,
                   color: black,
@@ -54,7 +59,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      child: const SearchedProductScreen(),
+                      type: PageTransitionType.rightToLeft,
+                    ),
+                  );
+                },
                 icon: Icon(
                   Icons.search,
                   color: black,

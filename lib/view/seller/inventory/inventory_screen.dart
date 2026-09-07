@@ -71,7 +71,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 ),
                 const Spacer(),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    CommonFunctions.showWarningToast(
+                        context: context, message: 'No new notifications');
+                  },
                   icon: Icon(
                     Icons.notifications_none,
                     color: black,
@@ -79,7 +82,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    CommonFunctions.showWarningToast(
+                        context: context,
+                        message: 'Inventory search coming soon');
+                  },
                   icon: Icon(
                     Icons.search,
                     color: black,
@@ -211,11 +218,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Text(
-                                          '₹ ${currentModel.discountedPrice.toString()}',
+                                          '\$ ${currentModel.discountedPrice.toString()}',
                                           style: textTheme.bodyMedium,
                                         ),
                                         Text(
-                                          '₹ ${currentModel.price.toString()}',
+                                          '\$ ${currentModel.price.toString()}',
                                           style: textTheme.labelMedium!
                                               .copyWith(
                                                   color: grey,

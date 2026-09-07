@@ -4,9 +4,9 @@ import 'dart:developer';
 
 import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/constants/constants.dart';
+import 'package:amazon/constants/demo_products.dart';
 import 'package:amazon/controller/provier/address_provider.dart';
 import 'package:amazon/controller/provier/deal_of_the_day_provider/deal_of_the_provider.dart';
-import 'package:amazon/controller/services/product_services/product_services.dart';
 import 'package:amazon/controller/services/user_data_crud_services/user_data_CRUD_services.dart';
 import 'package:amazon/model/address_model.dart';
 import 'package:amazon/model/product_model.dart';
@@ -127,32 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  headphoneDeals(int index) {
-    switch (index) {
-      case 0:
-        return 'Bose';
-      case 1:
-        return 'boAt';
-      case 2:
-        return 'Sony';
-      case 3:
-        return 'OnePlus';
-    }
-  }
-
-  clothingDeals(int index) {
-    switch (index) {
-      case 0:
-        return 'Kurtas, sarees & more';
-      case 1:
-        return 'Tops, dresses & more';
-      case 2:
-        return 'T-Shirt, jeans & more';
-      case 3:
-        return 'View all';
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -181,144 +155,30 @@ class _HomeScreenState extends State<HomeScreen> {
             const HomeScreenCategoriesList(),
             CommonFunctions.blankSpace(height * 0.01, 0),
             CommonFunctions.divider(),
-            HomeScreenBanner(height: height),
+            HomeScreenBanner(
+                height: height, width: width, textTheme: textTheme),
             CommonFunctions.divider(),
+            CategoryGridSection(
+                height: height, width: width, textTheme: textTheme),
+            CommonFunctions.divider(),
+            DealsBannerCard(height: height, width: width),
             TodaysDealHomeScreenWidget(
                 todaysDealsCarouselController: todaysDealsCarouselController),
             CommonFunctions.divider(),
-            otherOfferGridWidget(
-                title: 'Latest Launces in Headphones',
-                textBtnName: 'Explore More',
-                productPicNamesList: headphonesDeals,
-                offerFor: 'headphones'),
-            CommonFunctions.divider(),
-            SizedBox(
-              height: height * 0.35,
-              width: width,
-              child: const Image(
-                image: AssetImage(
-                  'assets/images/offersNsponcered/insurance.png',
-                ),
-                fit: BoxFit.fill,
-              ),
+            const PromoBannerCard(
+              imagePath: 'assets/images/banners/fitness.jpg',
+              title: 'Fitness & Sports',
             ),
             CommonFunctions.divider(),
-            otherOfferGridWidget(
-                title: 'Minimum 70% Off | Top Offers on Clothing',
-                textBtnName: 'See all deals',
-                productPicNamesList: clothingDealsList,
-                offerFor: 'clothing'),
-            CommonFunctions.divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CommonFunctions.blankSpace(height * 0.01, 0),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.03),
-                  child: Text(
-                    'Watch Sixer only on miniTV',
-                    style: textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Container(
-                  // height: height * 0.4,
-                  width: width,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.03,
-                    vertical: height * 0.01,
-                  ),
-                  child: const Image(
-                    image: AssetImage(
-                      'assets/images/offersNsponcered/sixer.png',
-                    ),
-                    fit: BoxFit.fill,
-                  ),
-                ),
-              ],
-            )
+            const PromoBannerCard(
+              imagePath: 'assets/images/banners/new_arrivals.jpg',
+              title: 'New Arrivals',
+            ),
+            CommonFunctions.blankSpace(height * 0.02, 0),
           ],
         ),
       ),
     );
-  }
-
-  Container otherOfferGridWidget(
-      {required String title,
-      required String textBtnName,
-      required List<String> productPicNamesList,
-      required String offerFor}) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: width * 0.03,
-          vertical: height * 0.01,
-        ),
-        width: width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: textTheme.bodyMedium!.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            CommonFunctions.blankSpace(
-              height * 0.01,
-              0,
-            ),
-            GridView.builder(
-                itemCount: 4,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10),
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {},
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    'assets/images/offersNsponcered/${productPicNamesList[index]}'),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Text(
-                          offerFor == 'headphones'
-                              ? headphoneDeals(index)
-                              : clothingDeals(index),
-                          style: textTheme.bodyMedium,
-                        )
-                      ],
-                    ),
-                  );
-                }),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                textBtnName,
-                style: textTheme.bodySmall!.copyWith(
-                  color: blue,
-                ),
-              ),
-            ),
-          ],
-        ));
   }
 }
 
@@ -352,22 +212,18 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                 style: textTheme.bodyMedium,
               ),
             );
-          } else if (dealOfTheDayProvider.deals.isEmpty) {
-            return Container(
-              height: height * 0.2,
-              width: width,
-              alignment: Alignment.center,
-              child: Text(
-                'No deals available right now — check back soon!',
-                style: textTheme.bodyMedium,
-              ),
-            );
           } else {
+            // Fall back to static demo products when there's no real
+            // inventory yet, so the home screen never shows an empty
+            // deal-of-the-day section for a brand-new account.
+            final List<ProductModel> deals = dealOfTheDayProvider.deals.isEmpty
+                ? demoProducts
+                : dealOfTheDayProvider.deals;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${dealOfTheDayProvider.deals.last.discountPercentage}%-${dealOfTheDayProvider.deals.first.discountPercentage}% off | Latest deals.',
+                  '${deals.last.discountPercentage}%-${deals.first.discountPercentage}% off | Latest deals.',
                   style: textTheme.displaySmall!.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -380,7 +236,7 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                     autoPlay: true,
                     viewportFraction: 1,
                   ),
-                  items: dealOfTheDayProvider.deals.map((i) {
+                  items: deals.map((i) {
                     ProductModel currentProduct = i;
                     return Builder(
                       builder: (BuildContext context) {
@@ -441,7 +297,7 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                 ),
                 CommonFunctions.blankSpace(height * 0.01, 0),
                 GridView.builder(
-                    itemCount: dealOfTheDayProvider.deals.length,
+                    itemCount: deals.length,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -450,8 +306,7 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                             crossAxisSpacing: 20),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      ProductModel currentModel =
-                          dealOfTheDayProvider.deals[index];
+                      ProductModel currentModel = deals[index];
                       return InkWell(
                         onTap: () {
                           log(index.toString());
@@ -472,7 +327,16 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                       );
                     }),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        child:
+                            const ProductCategoryScreen(productCategory: 'Deals'),
+                        type: PageTransitionType.rightToLeft,
+                      ),
+                    );
+                  },
                   child: Text(
                     'See all Deals',
                     style: textTheme.bodySmall!.copyWith(
@@ -493,37 +357,311 @@ class HomeScreenBanner extends StatelessWidget {
   const HomeScreenBanner({
     super.key,
     required this.height,
+    required this.width,
+    required this.textTheme,
   });
 
   final double height;
+  final double width;
+  final TextTheme textTheme;
 
   @override
   Widget build(BuildContext context) {
-    return CarouselSlider(
-      carouselController: CarouselSliderController(),
-      options: CarouselOptions(
-        height: height * 0.23,
-        autoPlay: true,
-        viewportFraction: 1,
-      ),
-      items: carouselPictures.map((i) {
-        return Builder(
-          builder: (BuildContext context) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              // margin: EdgeInsets.symmetric(horizontal: 5.0),
-
-              decoration: BoxDecoration(
-                color: Colors.amber,
-                image: DecorationImage(
-                  image: AssetImage('assets/images/carousel_slideshow/$i'),
-                  fit: BoxFit.cover,
+    return Stack(
+      children: [
+        Container(
+          height: height * 0.23,
+          width: width,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/banners/hero_banner.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Container(
+          height: height * 0.23,
+          width: width,
+          color: Colors.black.withValues(alpha: 0.35),
+        ),
+        Positioned(
+          left: width * 0.06,
+          top: height * 0.04,
+          right: width * 0.06,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Big Deals. Every Day.',
+                style: textTheme.displaySmall!.copyWith(
+                  color: white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            );
-          },
+              CommonFunctions.blankSpace(height * 0.008, 0),
+              Text(
+                'Shop the latest products at great prices',
+                style: textTheme.bodyMedium!.copyWith(color: white),
+              ),
+              CommonFunctions.blankSpace(height * 0.015, 0),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      child:
+                          const ProductCategoryScreen(productCategory: 'Deals'),
+                      type: PageTransitionType.rightToLeft,
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: amber),
+                child: const Text('Shop Now'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CategoryGridSection extends StatelessWidget {
+  const CategoryGridSection({
+    super.key,
+    required this.height,
+    required this.width,
+    required this.textTheme,
+  });
+
+  final double height;
+  final double width;
+  final TextTheme textTheme;
+
+  static const List<Map<String, String>> _cards = [
+    {
+      'image': 'women_fashion.jpg',
+      'title': "Women's Fashion",
+      'category': 'Fashion',
+    },
+    {
+      'image': 'men_fashion.jpg',
+      'title': "Men's Fashion",
+      'category': 'Fashion',
+    },
+    {
+      'image': 'electronics.jpg',
+      'title': 'Electronics',
+      'category': 'Electronics',
+    },
+    {
+      'image': 'home_furniture.jpg',
+      'title': 'Home & Furniture',
+      'category': 'Furniture',
+    },
+    {
+      'image': 'beauty.jpg',
+      'title': 'Beauty',
+      'category': 'Beauty',
+    },
+    {
+      'image': 'sports_shoes.jpg',
+      'title': 'Sports & Shoes',
+      'category': 'Fashion',
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: width * 0.03,
+        vertical: height * 0.01,
+      ),
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Shop by Category',
+            style: textTheme.bodyMedium!.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          CommonFunctions.blankSpace(height * 0.01, 0),
+          GridView.builder(
+            itemCount: _cards.length,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 1.3,
+            ),
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              final card = _cards[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      child: ProductCategoryScreen(
+                          productCategory: card['category']!),
+                      type: PageTransitionType.rightToLeft,
+                    ),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image(
+                        image: AssetImage(
+                            'assets/images/banners/${card['image']}'),
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          color: black38,
+                          child: Text(
+                            card['title']!,
+                            style: textTheme.bodySmall!.copyWith(
+                              color: white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DealsBannerCard extends StatelessWidget {
+  const DealsBannerCard({
+    super.key,
+    required this.height,
+    required this.width,
+  });
+
+  final double height;
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          PageTransition(
+            child: const ProductCategoryScreen(productCategory: 'Deals'),
+            type: PageTransitionType.rightToLeft,
+          ),
         );
-      }).toList(),
+      },
+      child: Stack(
+        children: [
+          Container(
+            height: height * 0.12,
+            width: width,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/banners/deals.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Container(
+            height: height * 0.12,
+            width: width,
+            color: Colors.black.withValues(alpha: 0.35),
+          ),
+          Positioned(
+            left: width * 0.06,
+            top: height * 0.025,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Today's Deals",
+                  style: textTheme.bodyLarge!.copyWith(
+                    color: white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'Up to 50% Off',
+                  style: textTheme.bodySmall!.copyWith(color: white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PromoBannerCard extends StatelessWidget {
+  const PromoBannerCard({
+    super.key,
+    required this.imagePath,
+    required this.title,
+  });
+
+  final String imagePath;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    final textTheme = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CommonFunctions.blankSpace(height * 0.01, 0),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+          child: Text(
+            title,
+            style: textTheme.bodyMedium!.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Container(
+          width: width,
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.03,
+            vertical: height * 0.01,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image(
+              image: AssetImage(imagePath),
+              width: width,
+              height: height * 0.2,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -716,7 +854,7 @@ class HomePageAppBar extends StatelessWidget {
                       left: width * 0.03,
                     ),
                     child: Text(
-                      'Search Amazon.in',
+                      'Search products',
                       style: Theme.of(context)
                           .textTheme
                           .bodySmall!
@@ -724,9 +862,16 @@ class HomePageAppBar extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  Icon(
-                    Icons.camera_alt_sharp,
-                    color: grey,
+                  InkWell(
+                    onTap: () {
+                      CommonFunctions.showWarningToast(
+                          context: context,
+                          message: 'Image search coming soon');
+                    },
+                    child: Icon(
+                      Icons.camera_alt_sharp,
+                      color: grey,
+                    ),
                   ),
                 ],
               ),
@@ -734,7 +879,8 @@ class HomePageAppBar extends StatelessWidget {
           ),
           IconButton(
               onPressed: () {
-                ProductServices.getImages(context: context);
+                CommonFunctions.showWarningToast(
+                    context: context, message: 'Voice search coming soon');
               },
               icon: Icon(
                 Icons.mic,

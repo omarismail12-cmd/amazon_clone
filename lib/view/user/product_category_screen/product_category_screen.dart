@@ -211,7 +211,11 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                   ),
                   const Spacer(),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        CommonFunctions.showWarningToast(
+                            context: context,
+                            message: 'Voice search coming soon');
+                      },
                       icon: Icon(
                         Icons.mic,
                         color: black,
@@ -505,7 +509,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: '₹ ',
+                                            text: '\$ ',
                                             style: textTheme.bodyMedium,
                                           ),
                                           TextSpan(
@@ -524,7 +528,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                           ),
                                           TextSpan(
                                             text:
-                                                '₹${currentProduct.price!.toStringAsFixed(0)}',
+                                                '\$${currentProduct.price!.toStringAsFixed(0)}',
                                             style:
                                                 textTheme.labelMedium!.copyWith(
                                               color: grey,

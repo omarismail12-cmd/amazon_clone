@@ -88,7 +88,10 @@ class _MonitorScreenState extends State<MonitorScreen> {
                 ),
                 const Spacer(),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    CommonFunctions.showWarningToast(
+                        context: context, message: 'No new notifications');
+                  },
                   icon: Icon(
                     Icons.notifications_none,
                     color: black,
@@ -96,7 +99,11 @@ class _MonitorScreenState extends State<MonitorScreen> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    CommonFunctions.showWarningToast(
+                        context: context,
+                        message: 'Inventory search coming soon');
+                  },
                   icon: Icon(
                     Icons.search,
                     color: black,
@@ -244,7 +251,7 @@ class _MonitorScreenState extends State<MonitorScreen> {
                                                               .bodySmall!,
                                                         ),
                                                         TextSpan(
-                                                          text: '₹ ${snapshot.data!.fold(
+                                                          text: '\$ ${snapshot.data!.fold(
                                                                 0.0,
                                                                 (previousValue,
                                                                         product) =>
@@ -318,11 +325,11 @@ class _MonitorScreenState extends State<MonitorScreen> {
                                                         .spaceEvenly,
                                                 children: [
                                                   Text(
-                                                    '₹ ${currentModel.discountedPrice.toString()}',
+                                                    '\$ ${currentModel.discountedPrice.toString()}',
                                                     style: textTheme.bodyMedium,
                                                   ),
                                                   Text(
-                                                    '₹ ${currentModel.price.toString()}',
+                                                    '\$ ${currentModel.price.toString()}',
                                                     style: textTheme
                                                         .labelMedium!
                                                         .copyWith(

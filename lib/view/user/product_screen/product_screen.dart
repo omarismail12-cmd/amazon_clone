@@ -400,7 +400,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     ),
                     TextSpan(
                       text:
-                          '\t\t₹ ${widget.productModel.discountedPrice!.toStringAsFixed(0)}',
+                          '\t\t\$ ${widget.productModel.discountedPrice!.toStringAsFixed(0)}',
                       style: textTheme.displayLarge!.copyWith(
                         color: black,
                         fontWeight: FontWeight.w700,
@@ -410,7 +410,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 ),
               ),
               Text(
-                'M.R.P: ₹ ${widget.productModel.price!.toStringAsFixed(0)}',
+                'M.R.P: \$ ${widget.productModel.price!.toStringAsFixed(0)}',
                 style: textTheme.labelMedium!.copyWith(
                     color: grey, decoration: TextDecoration.lineThrough),
               ),
@@ -760,7 +760,7 @@ class _ProductScreenState extends State<ProductScreen> {
                           stream: RatingServices.fetchReview(
                               productID: widget.productModel.productID!),
                           builder: (context, snapshot) {
-                            log('Total Ratings =  ${snapshot.data!.length}');
+                            log('Total Ratings =  ${snapshot.data?.length ?? 0}');
                             if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                               List<ReviewModel> reviewData = snapshot.data!;
                               return ListView.builder(
@@ -868,7 +868,7 @@ class _ProductScreenState extends State<ProductScreen> {
                           stream: RatingServices.fetchReview(
                               productID: widget.productModel.productID!),
                           builder: (context, snapshot) {
-                            log('Total Ratings =  ${snapshot.data!.length}');
+                            log('Total Ratings =  ${snapshot.data?.length ?? 0}');
                             if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                               List<ReviewModel> reviewData = snapshot.data!;
                               return ListView.builder(
@@ -984,8 +984,8 @@ class _ProductScreenState extends State<ProductScreen> {
                 stream: RatingServices.fetchReview(
                     productID: widget.productModel.productID!),
                 builder: (context, snapshot) {
-                  log('Total Ratings =  ${snapshot.data!.length}');
-                  if (snapshot.data!.isEmpty) {
+                  log('Total Ratings =  ${snapshot.data?.length ?? 0}');
+                  if ((snapshot.data ?? []).isEmpty) {
                     return Text(
                       'No Ratings yet',
                       style: textTheme.labelMedium!.copyWith(color: grey),
