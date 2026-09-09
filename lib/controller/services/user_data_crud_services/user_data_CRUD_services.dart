@@ -54,14 +54,9 @@ class UserDataCRUD {
     }
     bool userPresent = false;
     try {
-      await firestore
-          .collection('users')
-          .where('mobileNum', isEqualTo: phone)
-          .get()
-          .then((value) {
-        value.size > 0 ? userPresent = true : userPresent = false;
-        log(value.toString());
-      });
+      final DocumentSnapshot<Map<String, dynamic>> doc =
+          await firestore.collection('users').doc(phone).get();
+      userPresent = doc.exists;
     } catch (e) {
       log(e.toString());
     }
