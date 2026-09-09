@@ -54,6 +54,7 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   TextEditingController reviewTextController = TextEditingController();
+  TextEditingController reviewImageUrlController = TextEditingController();
   double usersRating = -1;
   @override
   void dispose() {
@@ -582,7 +583,14 @@ class _ProductScreenState extends State<ProductScreen> {
                         0,
                       ),
                       Builder(builder: (context) {
-                        if (productRating.productImages.isEmpty) {
+                        final List<Uint8List> productImages =
+                            productRating.productImages;
+                        final List<String> manualUrls =
+                            productRating.manualImageUrls;
+                        final int byteCount = productImages.length;
+                        final int totalCount =
+                            byteCount + manualUrls.length;
+                        if (totalCount == 0) {
                           return InkWell(
                             onTap: () {
                               context
@@ -618,11 +626,9 @@ class _ProductScreenState extends State<ProductScreen> {
                             ),
                           );
                         } else {
-                          List<Uint8List> productImages =
-                              productRating.productImages;
                           return GridView.builder(
                             shrinkWrap: true,
-                            itemCount: productImages.length,
+                            itemCount: totalCount,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 5,
@@ -630,16 +636,98 @@ class _ProductScreenState extends State<ProductScreen> {
                               crossAxisSpacing: 4,
                             ),
                             itemBuilder: (context, index) {
-                              return Image(
-                                image: MemoryImage(
-                                  productImages[index],
-                                ),
-                                fit: BoxFit.contain,
+                              final bool isPickedImage = index < byteCount;
+                              final ImageProvider imageProvider = isPickedImage
+                                  ? MemoryImage(productImages[index])
+                                  : NetworkImage(
+                                      manualUrls[index - byteCount],
+                                    ) as ImageProvider;
+                              return Stack(
+                                children: [
+                                  Image(
+                                    image: imageProvider,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (isPickedImage) {
+                                          context
+                                              .read<RatingProvider>()
+                                              .removeProductImage(index);
+                                        } else {
+                                          context
+                                              .read<RatingProvider>()
+                                              .removeManualImageUrl(
+                                                  index - byteCount);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          color: black38,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: width * 0.03,
+                                          color: white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               );
                             },
                           );
                         }
                       }),
+                      CommonFunctions.blankSpace(height * 0.01, 0),
+                      Text(
+                        'Or paste an image URL',
+                        style: textTheme.bodySmall!.copyWith(color: grey),
+                      ),
+                      CommonFunctions.blankSpace(height * 0.005, 0),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: reviewImageUrlController,
+                              decoration: InputDecoration(
+                                hintText: 'https://example.com/image.jpg',
+                                hintStyle: textTheme.bodySmall,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide: BorderSide(color: grey),
+                                ),
+                              ),
+                            ),
+                          ),
+                          CommonFunctions.blankSpace(0, width * 0.02),
+                          ElevatedButton(
+                            onPressed: () {
+                              final url = reviewImageUrlController.text.trim();
+                              if (!url.startsWith('http://') &&
+                                  !url.startsWith('https://')) {
+                                CommonFunctions.showErrorToast(
+                                  context: context,
+                                  message: 'Please enter a valid image URL',
+                                );
+                                return;
+                              }
+                              context
+                                  .read<RatingProvider>()
+                                  .addManualImageUrl(url);
+                              reviewImageUrlController.clear();
+                            },
+                            style:
+                                ElevatedButton.styleFrom(backgroundColor: amber),
+                            child: const Text('Add'),
+                          ),
+                        ],
+                      ),
                       RatingBar(
                         initialRating: 0,
                         direction: Axis.horizontal,
@@ -701,9 +789,14 @@ class _ProductScreenState extends State<ProductScreen> {
 
                               ReviewModel reviewModel = ReviewModel(
                                 rating: usersRating,
-                                imagesURL: context
-                                    .read<RatingProvider>()
-                                    .productImagesURL,
+                                imagesURL: [
+                                  ...context
+                                      .read<RatingProvider>()
+                                      .productImagesURL,
+                                  ...context
+                                      .read<RatingProvider>()
+                                      .manualImageUrls,
+                                ],
                                 reviewID: uuid.v1(),
                                 review: reviewTextController.text.trim(),
                                 userID: auth.currentUser!.phoneNumber!,
@@ -719,7 +812,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                 rating: usersRating,
                                 imagesURL: context
                                     .read<RatingProvider>()
-                                    .productImagesURL,
+                                    .manualImageUrls,
                                 reviewID: uuid.v1(),
                                 review: reviewTextController.text.trim(),
                                 userID: auth.currentUser!.phoneNumber!,

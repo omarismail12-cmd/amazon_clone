@@ -1,4 +1,5 @@
 import 'package:amazon/constants/common_functions.dart';
+import 'package:amazon/controller/services/auth_services/auth_services.dart';
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/product_model.dart';
 import 'package:amazon/model/user_product_model.dart';
@@ -107,7 +108,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   0,
                 ),
                 CommonFunctions.divider(),
-                BuyAgain(width: width, height: height, textTheme: textTheme)
+                BuyAgain(width: width, height: height, textTheme: textTheme),
+                CommonFunctions.blankSpace(height * 0.03, 0),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.04),
+                  child: ElevatedButton(
+                    onPressed: () => AuthServices.confirmSignOut(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: amber,
+                      minimumSize: Size(width, height * 0.06),
+                    ),
+                    child: Text('Sign Out', style: textTheme.bodyMedium),
+                  ),
+                ),
+                CommonFunctions.blankSpace(height * 0.02, 0),
               ],
             ),
           ),

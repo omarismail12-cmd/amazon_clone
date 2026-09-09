@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 class SellerProductProvider extends ChangeNotifier {
   List<Uint8List> productImages = [];
   List<String> productImagesURL = [];
+  // Image URLs the seller pasted directly (not device-picked, so nothing to
+  // upload to ImgBB for these — used as-is in the final imagesURL list).
+  List<String> manualImageUrls = [];
   List<ProductModel> products = [];
   bool sellerProductsFetched = false;
 
@@ -19,6 +22,16 @@ class SellerProductProvider extends ChangeNotifier {
 
   removeProductImage(int index) {
     productImages = List<Uint8List>.from(productImages)..removeAt(index);
+    notifyListeners();
+  }
+
+  addManualImageUrl(String url) {
+    manualImageUrls = [...manualImageUrls, url];
+    notifyListeners();
+  }
+
+  removeManualImageUrl(int index) {
+    manualImageUrls = List<String>.from(manualImageUrls)..removeAt(index);
     notifyListeners();
   }
 
@@ -35,6 +48,7 @@ class SellerProductProvider extends ChangeNotifier {
 
   emptyProductImagesList() {
     productImages = [];
+    manualImageUrls = [];
     notifyListeners();
   }
 }

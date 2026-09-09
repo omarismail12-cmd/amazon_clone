@@ -30,6 +30,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   TextEditingController productPriceController = TextEditingController();
   TextEditingController discountedProductPriceController =
       TextEditingController();
+  TextEditingController imageUrlController = TextEditingController();
   String dropDownValue = 'Select Category';
   bool addProductBtnPressed = false;
   @override
@@ -44,7 +45,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   onPressed() async {
-    if (context.read<SellerProductProvider>().productImages.isEmpty) {
+    final sellerProductProvider = context.read<SellerProductProvider>();
+    if (sellerProductProvider.productImages.isEmpty &&
+        sellerProductProvider.manualImageUrls.isEmpty) {
       return;
     }
     if (dropDownValue == 'Select Category') {
@@ -65,16 +68,17 @@ class _AddProductScreenState extends State<AddProductScreen> {
       addProductBtnPressed = true;
     });
     final uploadSuccess = await ProductServices.uploadImages(
-        images: context.read<SellerProductProvider>().productImages,
-        context: context);
+        images: sellerProductProvider.productImages, context: context);
     if (!uploadSuccess) {
       setState(() {
         addProductBtnPressed = false;
       });
       return;
     }
-    List<String> imagesURLs =
-        context.read<SellerProductProvider>().productImagesURL;
+    List<String> imagesURLs = [
+      ...context.read<SellerProductProvider>().productImagesURL,
+      ...sellerProductProvider.manualImageUrls,
+    ];
     Uuid uuid = const Uuid();
     String sellerID = auth.currentUser!.phoneNumber!;
     String productID = '$sellerID${uuid.v1()}';
@@ -132,7 +136,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
           child: Column(
             children: [
               ProductImageBanner(
-                  height: height, width: width, textTheme: textTheme),
+                  height: height,
+                  width: width,
+                  textTheme: textTheme,
+                  imageUrlController: imageUrlController),
               CommonFunctions.blankSpace(height * 0.02, 0),
               productDetails(height, textTheme, width),
               CommonFunctions.blankSpace(height * 0.03, 0),
@@ -316,135 +323,194 @@ class ProductImageBanner extends StatelessWidget {
     required this.height,
     required this.width,
     required this.textTheme,
+    required this.imageUrlController,
   });
 
   final double height;
   final double width;
   final TextTheme textTheme;
+  final TextEditingController imageUrlController;
+
+  void _addImageUrl(BuildContext context) {
+    final url = imageUrlController.text.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      CommonFunctions.showErrorToast(
+          context: context, message: 'Please enter a valid image URL');
+      return;
+    }
+    context.read<SellerProductProvider>().addManualImageUrl(url);
+    imageUrlController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<SellerProductProvider>(
         builder: (context, productProvider, child) {
-      return Builder(builder: (context) {
-        if (productProvider.productImages.isEmpty) {
-          return InkWell(
-            onTap: () {
-              context
-                  .read<SellerProductProvider>()
-                  .fetchProductImagesFromGallery(context: context);
-            },
-            child: Container(
-              height: height * 0.23,
-              width: width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: greyShade3,
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add,
-                    size: height * 0.09,
+      final double thumbnailSize = height * 0.23;
+      final List<Uint8List> images = productProvider.productImages;
+      final List<String> manualUrls = productProvider.manualImageUrls;
+      final int byteCount = images.length;
+      final int totalCount = byteCount + manualUrls.length;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (totalCount == 0)
+            InkWell(
+              onTap: () {
+                context
+                    .read<SellerProductProvider>()
+                    .fetchProductImagesFromGallery(context: context);
+              },
+              child: Container(
+                height: thumbnailSize,
+                width: width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
                     color: greyShade3,
                   ),
-                  Text(
-                    'Add Product',
-                    style: textTheme.displayMedium!.copyWith(
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add,
+                      size: height * 0.09,
                       color: greyShade3,
                     ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          List<Uint8List> images = productProvider.productImages;
-          final double thumbnailSize = height * 0.23;
-          return SizedBox(
-            height: thumbnailSize,
-            width: width,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: images.length + 1,
-              itemBuilder: (context, index) {
-                if (index == images.length) {
-                  return InkWell(
-                    onTap: () {
-                      context
-                          .read<SellerProductProvider>()
-                          .fetchProductImagesFromGallery(context: context);
-                    },
-                    child: Container(
-                      height: thumbnailSize,
-                      width: thumbnailSize,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: greyShade3,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: height * 0.06,
+                    Text(
+                      'Add Product',
+                      style: textTheme.displayMedium!.copyWith(
                         color: greyShade3,
                       ),
                     ),
-                  );
-                }
-                return Padding(
-                  padding: EdgeInsets.only(right: width * 0.02),
-                  child: Stack(
-                    children: [
-                      Container(
+                  ],
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: thumbnailSize,
+              width: width,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: totalCount + 1,
+                itemBuilder: (context, index) {
+                  if (index == totalCount) {
+                    return InkWell(
+                      onTap: () {
+                        context
+                            .read<SellerProductProvider>()
+                            .fetchProductImagesFromGallery(context: context);
+                      },
+                      child: Container(
                         height: thumbnailSize,
                         width: thumbnailSize,
                         decoration: BoxDecoration(
-                          color: white,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: greyShade3,
                           ),
-                          image: DecorationImage(
-                            image: MemoryImage(images[index]),
-                            fit: BoxFit.cover,
-                          ),
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          size: height * 0.06,
+                          color: greyShade3,
                         ),
                       ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: InkWell(
-                          onTap: () {
-                            context
-                                .read<SellerProductProvider>()
-                                .removeProductImage(index);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: black38,
-                              shape: BoxShape.circle,
+                    );
+                  }
+                  final bool isPickedImage = index < byteCount;
+                  final ImageProvider imageProvider = isPickedImage
+                      ? MemoryImage(images[index])
+                      : NetworkImage(manualUrls[index - byteCount])
+                          as ImageProvider;
+                  return Padding(
+                    padding: EdgeInsets.only(right: width * 0.02),
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: thumbnailSize,
+                          width: thumbnailSize,
+                          decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: greyShade3,
                             ),
-                            child: Icon(
-                              Icons.close,
-                              size: height * 0.025,
-                              color: white,
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: InkWell(
+                            onTap: () {
+                              if (isPickedImage) {
+                                context
+                                    .read<SellerProductProvider>()
+                                    .removeProductImage(index);
+                              } else {
+                                context
+                                    .read<SellerProductProvider>()
+                                    .removeManualImageUrl(index - byteCount);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: black38,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.close,
+                                size: height * 0.025,
+                                color: white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          );
-        }
-      });
+          CommonFunctions.blankSpace(height * 0.015, 0),
+          Text(
+            'Or paste an image URL',
+            style: textTheme.bodySmall!.copyWith(color: grey),
+          ),
+          CommonFunctions.blankSpace(height * 0.005, 0),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: imageUrlController,
+                  decoration: InputDecoration(
+                    hintText: 'https://example.com/image.jpg',
+                    hintStyle: textTheme.bodySmall,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: BorderSide(color: grey),
+                    ),
+                  ),
+                ),
+              ),
+              CommonFunctions.blankSpace(0, width * 0.02),
+              ElevatedButton(
+                onPressed: () => _addImageUrl(context),
+                style: ElevatedButton.styleFrom(backgroundColor: amber),
+                child: const Text('Add'),
+              ),
+            ],
+          ),
+        ],
+      );
     });
   }
 }

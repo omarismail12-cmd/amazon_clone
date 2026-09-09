@@ -73,4 +73,43 @@ class AuthServices {
       log(e.toString());
     }
   }
+
+  static Future<void> signOut() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    return auth.signOut();
+  }
+
+  /// Shows a confirmation dialog, and on confirm signs the user out and
+  /// navigates back to the sign-in flow, clearing the navigation stack so
+  /// the user can't back-button into the authenticated app afterward.
+  static Future<void> confirmSignOut(BuildContext context) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await signOut();
+    if (!context.mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      PageTransition(
+        child: const SignInLogic(),
+        type: PageTransitionType.rightToLeft,
+      ),
+      (route) => false,
+    );
+  }
 }

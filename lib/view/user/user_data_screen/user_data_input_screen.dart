@@ -16,6 +16,7 @@ class UserDataInputScrren extends StatefulWidget {
 class _UserDataInputScrrenState extends State<UserDataInputScrren> {
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  bool isSeller = false;
   @override
   void initState() {
     super.initState();
@@ -161,13 +162,30 @@ class _UserDataInputScrrenState extends State<UserDataInputScrren> {
                 ),
               ),
             ),
+            CommonFunctions.blankSpace(
+              height * 0.02,
+              0,
+            ),
+            Text(
+              'Account Type',
+              style: textTheme.bodyMedium,
+            ),
+            CommonFunctions.blankSpace(
+              height * 0.01,
+              0,
+            ),
+            _RoleToggle(
+              isSeller: isSeller,
+              onSelectBuyer: () => setState(() => isSeller = false),
+              onSelectSeller: () => setState(() => isSeller = true),
+            ),
             const Spacer(),
             ElevatedButton(
                 onPressed: () async {
                   UserModel userModel = UserModel(
                     name: nameController.text.trim(),
                     mobileNum: phoneController.text.trim(),
-                    userType: 'user',
+                    userType: isSeller ? 'seller' : 'user',
                   );
                   await UserDataCRUD.addNewUser(
                       userModel: userModel, context: context);
@@ -181,6 +199,96 @@ class _UserDataInputScrrenState extends State<UserDataInputScrren> {
                 ),
                 child: Text('Proceed', style: textTheme.bodyMedium))
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoleToggle extends StatelessWidget {
+  const _RoleToggle({
+    required this.isSeller,
+    required this.onSelectBuyer,
+    required this.onSelectSeller,
+  });
+
+  final bool isSeller;
+  final VoidCallback onSelectBuyer;
+  final VoidCallback onSelectSeller;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _RoleToggleTab(
+              label: "I'm a Buyer",
+              selected: !isSeller,
+              onTap: onSelectBuyer,
+            ),
+          ),
+          Expanded(
+            child: _RoleToggleTab(
+              label: "I'm a Seller",
+              selected: isSeller,
+              onTap: onSelectSeller,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoleToggleTab extends StatelessWidget {
+  const _RoleToggleTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? colorScheme.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: colorScheme.shadow.withValues(alpha: 0.08),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: textTheme.titleMedium?.copyWith(
+            color:
+                selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
