@@ -226,16 +226,18 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
         body: Consumer<ProductsBasedOnCategoryProvider>(
             builder: (context, usersProductProvider, child) {
           if (usersProductProvider.productsFetched == false) {
-            // return Center(
-            //   child: CircularProgressIndicator(
-            //     color: amber,
-            //   ),
-            // );
-            return const SizedBox();
+            return Center(
+              child: CircularProgressIndicator(
+                color: amber,
+              ),
+            );
           } else {
             if (usersProductProvider.products.isEmpty) {
-              return const Center(
-                child: Text('Opps! Product not found'),
+              return Center(
+                child: Text(
+                  'No products found in this category yet',
+                  style: textTheme.bodyMedium,
+                ),
               );
             } else {
               return ListView.builder(

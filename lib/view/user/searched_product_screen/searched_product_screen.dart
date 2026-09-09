@@ -147,7 +147,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UsersProductProvider>().emptySearchedProductsList();
+      context.read<UsersProductProvider>().fetchAllProducts();
     });
   }
 
@@ -188,11 +188,10 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                     width: width * 0.68,
                     child: TextField(
                       controller: searchController,
-                      onSubmitted: (productName) {
-                        // log(productName);
+                      onChanged: (productName) {
                         context
                             .read<UsersProductProvider>()
-                            .getSearchedProducts(productName: productName);
+                            .filterProducts(productName);
                       },
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
@@ -223,12 +222,11 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         body: Consumer<UsersProductProvider>(
             builder: (context, usersProductProvider, child) {
           if (usersProductProvider.productsFetched == false) {
-            // return Center(
-            //   child: CircularProgressIndicator(
-            //     color: amber,
-            //   ),
-            // );
-            return const SizedBox();
+            return Center(
+              child: CircularProgressIndicator(
+                color: amber,
+              ),
+            );
           } else {
             if (usersProductProvider.searchedProducts.isEmpty) {
               return const Center(

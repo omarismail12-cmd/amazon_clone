@@ -36,6 +36,21 @@ class UsersProductService {
     return sellersProducts;
   }
 
+  static Future<List<ProductModel>> getAllProducts() async {
+    List<ProductModel> products = [];
+    try {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await firestore.collection('Products').get();
+      snapshot.docs.forEach((element) {
+        products.add(ProductModel.fromMap(element.data()));
+      });
+    } catch (e) {
+      log('error Found');
+      log(e.toString());
+    }
+    return products;
+  }
+
   static Future addProductToCart({
     required BuildContext context,
     required UserProductModel productModel,

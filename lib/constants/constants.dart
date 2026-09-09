@@ -18,7 +18,6 @@ String? get currentUserPhone => auth.currentUser?.phoneNumber;
 // directly on-device. No such backend exists yet — this needs to be added
 // before going live.
 const String keyID = 'rzp_test_TZvU4eurVLhnvu';
-const String keySecret = 'ZABeNHJT7Jct7jECWAG2eZFe';
 
 List<String> categories = [
   'Prime',

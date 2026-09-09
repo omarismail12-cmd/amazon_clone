@@ -27,29 +27,32 @@ class _SignInLogicState extends State<SignInLogic> {
       log('start');
       log(userIsSeller.toString());
       if (userIsSeller == true) {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           PageTransition(
             child: const SellerBottomNavBar(),
             type: PageTransitionType.rightToLeft,
           ),
+          (route) => false,
         );
       } else {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           PageTransition(
             child: const UserBottomNavBar(),
             type: PageTransitionType.rightToLeft,
           ),
+          (route) => false,
         );
       }
     } else {
-      Navigator.push(
+      Navigator.pushAndRemoveUntil(
         context,
         PageTransition(
           child: const UserDataInputScrren(),
           type: PageTransitionType.rightToLeft,
         ),
+        (route) => false,
       );
     }
   }

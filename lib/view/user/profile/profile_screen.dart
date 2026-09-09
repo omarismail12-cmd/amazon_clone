@@ -4,6 +4,7 @@ import 'package:amazon/controller/services/users_product_services/users_product_
 import 'package:amazon/model/product_model.dart';
 import 'package:amazon/model/user_product_model.dart';
 import 'package:amazon/utils/colors.dart';
+import 'package:amazon/view/user/browsing_history_screen/browsing_history_screen.dart';
 import 'package:amazon/view/user/orders_screen/orders_screen.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
 import 'package:amazon/view/user/searched_product_screen/searched_product_screen.dart';
@@ -75,6 +76,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     size: height * 0.035,
                   ),
                 ),
+                IconButton(
+                  onPressed: () => AuthServices.confirmSignOut(context),
+                  icon: Icon(
+                    Icons.logout,
+                    color: black,
+                    size: height * 0.035,
+                  ),
+                ),
               ],
             ),
           ),
@@ -109,18 +118,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 CommonFunctions.divider(),
                 BuyAgain(width: width, height: height, textTheme: textTheme),
-                CommonFunctions.blankSpace(height * 0.03, 0),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-                  child: ElevatedButton(
-                    onPressed: () => AuthServices.confirmSignOut(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: amber,
-                      minimumSize: Size(width, height * 0.06),
-                    ),
-                    child: Text('Sign Out', style: textTheme.bodyMedium),
-                  ),
-                ),
                 CommonFunctions.blankSpace(height * 0.02, 0),
               ],
             ),
@@ -157,10 +154,21 @@ class KeepShopping extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
-                'Browsing history',
-                style: textTheme.bodySmall!.copyWith(
-                  color: blue,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      child: const BrowsingHistoryScreen(),
+                      type: PageTransitionType.rightToLeft,
+                    ),
+                  );
+                },
+                child: Text(
+                  'Browsing history',
+                  style: textTheme.bodySmall!.copyWith(
+                    color: blue,
+                  ),
                 ),
               ),
             ],
@@ -284,10 +292,16 @@ class BuyAgain extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
-                'See all',
-                style: textTheme.bodySmall!.copyWith(
-                  color: blue,
+              InkWell(
+                onTap: () {
+                  CommonFunctions.showWarningToast(
+                      context: context, message: 'Buy Again coming soon');
+                },
+                child: Text(
+                  'See all',
+                  style: textTheme.bodySmall!.copyWith(
+                    color: blue,
+                  ),
                 ),
               ),
             ],
@@ -368,10 +382,21 @@ class UsersOrders extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          'See all',
-                          style: textTheme.bodySmall!.copyWith(
-                            color: blue,
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              PageTransition(
+                                child: const OrdersScreen(),
+                                type: PageTransitionType.rightToLeft,
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'See all',
+                            style: textTheme.bodySmall!.copyWith(
+                              color: blue,
+                            ),
                           ),
                         ),
                       ],

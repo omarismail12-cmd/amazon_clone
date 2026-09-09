@@ -1,6 +1,8 @@
 import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/utils/colors.dart';
+import 'package:amazon/view/user/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../home/home_screen.dart';
 
@@ -72,34 +74,51 @@ class _MenuScreenState extends State<MenuScreen> {
                   shrinkWrap: true,
                   physics: const PageScrollPhysics(),
                   itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.symmetric(vertical: height * 0.005),
-                      padding: EdgeInsets.symmetric(
-                        vertical: height * 0.005,
-                        horizontal: width * 0.03,
+                    return InkWell(
+                      onTap: () {
+                        if (index == 0) {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              child: const SettingsScreen(),
+                              type: PageTransitionType.rightToLeft,
+                            ),
+                          );
+                        } else {
+                          CommonFunctions.showWarningToast(
+                              context: context,
+                              message: 'Customer Service coming soon');
+                        }
+                      },
+                      child: Container(
+                        margin: EdgeInsets.symmetric(vertical: height * 0.005),
+                        padding: EdgeInsets.symmetric(
+                          vertical: height * 0.005,
+                          horizontal: width * 0.03,
+                        ),
+                        height: height * 0.06,
+                        width: width,
+                        decoration: BoxDecoration(
+                          color: white,
+                          borderRadius: BorderRadius.circular(
+                            10,
+                          ),
+                          border: Border.all(
+                            color: teal,
+                          ),
+                        ),
+                        child: Row(children: [
+                          Text(
+                            index == 0 ? 'Settings' : 'Customer Service',
+                            style: textTheme.bodyMedium,
+                          ),
+                          const Spacer(),
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            color: black,
+                          )
+                        ]),
                       ),
-                      height: height * 0.06,
-                      width: width,
-                      decoration: BoxDecoration(
-                        color: white,
-                        borderRadius: BorderRadius.circular(
-                          10,
-                        ),
-                        border: Border.all(
-                          color: teal,
-                        ),
-                      ),
-                      child: Row(children: [
-                        Text(
-                          index == 0 ? 'Settings' : 'Customer Service',
-                          style: textTheme.bodyMedium,
-                        ),
-                        const Spacer(),
-                        Icon(
-                          Icons.chevron_right_rounded,
-                          color: black,
-                        )
-                      ]),
                     );
                   })
             ],
