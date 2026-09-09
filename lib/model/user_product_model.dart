@@ -77,9 +77,11 @@ class UserProductModel {
       specifications: map['specifications'] != null
           ? map['specifications'] as String
           : null,
-      price: map['price'] != null ? map['price'] as double : null,
+      // See ProductModel.fromMap: Firestore may store a whole-number field
+      // as int rather than double, which `as double` can't cast directly.
+      price: map['price'] != null ? (map['price'] as num).toDouble() : null,
       discountedPrice: map['discountedPrice'] != null
-          ? map['discountedPrice'] as double
+          ? (map['discountedPrice'] as num).toDouble()
           : null,
       productID: map['productID'] != null ? map['productID'] as String : null,
       productSellerID: map['productSellerID'] != null
@@ -87,10 +89,11 @@ class UserProductModel {
           : null,
       inStock: map['inStock'] != null ? map['inStock'] as bool : null,
       discountPercentage: map['discountPercentage'] != null
-          ? map['discountPercentage'] as int
+          ? (map['discountPercentage'] as num).toInt()
           : null,
-      productCount:
-          map['productCount'] != null ? map['productCount'] as int : null,
+      productCount: map['productCount'] != null
+          ? (map['productCount'] as num).toInt()
+          : null,
       time: map['time'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['time'] as int)
           : null,

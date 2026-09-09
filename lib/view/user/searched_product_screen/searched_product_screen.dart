@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:amazon/constants/common_functions.dart';
@@ -24,6 +25,7 @@ class SearchedProductScreen extends StatefulWidget {
 
 class _SearchedProductScreenState extends State<SearchedProductScreen> {
   TextEditingController searchController = TextEditingController();
+  Timer? _debounce;
 
   getDay(int dayNum) {
     switch (dayNum % 7) {
@@ -152,6 +154,13 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
   }
 
   @override
+  void dispose() {
+    _debounce?.cancel();
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -189,9 +198,14 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                     child: TextField(
                       controller: searchController,
                       onChanged: (productName) {
-                        context
-                            .read<UsersProductProvider>()
-                            .filterProducts(productName);
+                        _debounce?.cancel();
+                        _debounce =
+                            Timer(const Duration(milliseconds: 1500), () {
+                          if (!mounted) return;
+                          context
+                              .read<UsersProductProvider>()
+                              .filterProducts(productName);
+                        });
                       },
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(

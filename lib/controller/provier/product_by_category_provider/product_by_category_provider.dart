@@ -9,8 +9,14 @@ class ProductsBasedOnCategoryProvider extends ChangeNotifier {
 
   fetchProducts({required String category}) async {
     products = [];
-    products = await UsersProductService.fetchProductBasedOnCategory(
-        category: category);
+    // 'Deals' isn't a category sellers can assign to a product (it's not in
+    // productCategories) — it means "today's deals", so route it to the
+    // same discount-based query the home screen's Deal of the Day uses
+    // instead of a category-equality query that can never match anything.
+    products = category == 'Deals'
+        ? await UsersProductService.featchDealOfTheDay()
+        : await UsersProductService.fetchProductBasedOnCategory(
+            category: category);
     productsFetched = true;
     notifyListeners();
   }

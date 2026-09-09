@@ -79,9 +79,12 @@ class ProductModel {
       specifications: map['specifications'] != null
           ? map['specifications'] as String
           : null,
-      price: map['price'] != null ? map['price'] as double : null,
+      // Firestore stores a whole-number field (e.g. entered without a
+      // decimal in the console) as int, not double — `as double` throws
+      // on those docs. Going through `num` first accepts either.
+      price: map['price'] != null ? (map['price'] as num).toDouble() : null,
       discountedPrice: map['discountedPrice'] != null
-          ? map['discountedPrice'] as double
+          ? (map['discountedPrice'] as num).toDouble()
           : null,
       productID: map['productID'] != null ? map['productID'] as String : null,
       productSellerID: map['productSellerID'] != null
@@ -91,7 +94,9 @@ class ProductModel {
       uploadedAt: map['uploadedAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['uploadedAt'] as int)
           : null,
-      discountPercentage: map['discountPercentage'] != null ? map['discountPercentage'] as int : null,
+      discountPercentage: map['discountPercentage'] != null
+          ? (map['discountPercentage'] as num).toInt()
+          : null,
 
     );
   }

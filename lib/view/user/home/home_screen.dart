@@ -683,13 +683,23 @@ class HomeScreenCategoriesList extends StatelessWidget {
         itemCount: categories.length,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
+          final String category = categories[index];
+          // 'Deals' has its own discount-based query; anything else must be
+          // a category a seller can actually assign, or the destination
+          // screen would always come back empty.
+          final bool isFilterable =
+              category == 'Deals' || productCategories.contains(category);
           return InkWell(
             onTap: () {
+              if (!isFilterable) {
+                CommonFunctions.showWarningToast(
+                    context: context, message: '$category coming soon');
+                return;
+              }
               Navigator.push(
                 context,
                 PageTransition(
-                  child:
-                      ProductCategoryScreen(productCategory: categories[index]),
+                  child: ProductCategoryScreen(productCategory: category),
                   type: PageTransitionType.rightToLeft,
                 ),
               );
@@ -703,12 +713,12 @@ class HomeScreenCategoriesList extends StatelessWidget {
                 children: [
                   Image(
                     image: AssetImage(
-                      'assets/images/categories/${categories[index]}.png',
+                      'assets/images/categories/$category.png',
                     ),
                     height: height * 0.07,
                   ),
                   Text(
-                    categories[index],
+                    category,
                     style: textTheme.labelMedium,
                   )
                 ],

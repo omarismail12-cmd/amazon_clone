@@ -8,6 +8,7 @@ import 'package:amazon/view/user/browsing_history_screen/browsing_history_screen
 import 'package:amazon/view/user/orders_screen/orders_screen.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
 import 'package:amazon/view/user/searched_product_screen/searched_product_screen.dart';
+import 'package:amazon/view/user/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -537,6 +538,17 @@ class YouGridBtons extends StatelessWidget {
                   type: PageTransitionType.rightToLeft,
                 ),
               );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                PageTransition(
+                  child: const SettingsScreen(),
+                  type: PageTransitionType.rightToLeft,
+                ),
+              );
+            } else if (index == 3) {
+              CommonFunctions.showWarningToast(
+                  context: context, message: 'Wish List coming soon');
             }
           },
           child: Container(
