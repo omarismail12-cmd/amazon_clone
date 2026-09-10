@@ -2,6 +2,7 @@ import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/provier/product_provider/product_provider.dart';
 import 'package:amazon/controller/services/auth_services/auth_services.dart';
 import 'package:amazon/model/product_model.dart';
+import 'package:amazon/view/common_widgets/product_image.dart';
 import 'package:amazon/view/seller/add_product_screen/add_products_screen.dart';
 import 'package:amazon/view/user/notifications_screen/notifications_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -177,12 +178,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                           width: MediaQuery.of(context)
                                               .size
                                               .width,
-                                          decoration: BoxDecoration(
-                                            color: white,
-                                            image: DecorationImage(
-                                              image: NetworkImage(i),
-                                              fit: BoxFit.cover,
-                                            ),
+                                          color: white,
+                                          child: ProductImage(
+                                            imageUrl: i,
+                                            fit: BoxFit.cover,
                                           ),
                                         );
                                       },

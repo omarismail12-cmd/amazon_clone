@@ -299,7 +299,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   btnWidth: 0.88,
                   isLoading: isSendingOtp,
                   onPressed: () => _sendOtp(context,
-                      '+$currentCountryCode${mobileController.text.trim()}'),
+                      '$currentCountryCode${mobileController.text.trim()}'),
                 ),
                 CommonFunctions.blankSpace(
                   height * 0.02,

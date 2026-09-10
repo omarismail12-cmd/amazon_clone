@@ -1,9 +1,13 @@
 import 'package:amazon/constants/common_functions.dart';
+import 'package:amazon/constants/constants.dart';
 import 'package:amazon/controller/services/auth_services/auth_services.dart';
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/product_model.dart';
+import 'package:amazon/model/user_model.dart';
 import 'package:amazon/model/user_product_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:amazon/utils/colors.dart';
+import 'package:amazon/view/common_widgets/product_image.dart';
 import 'package:amazon/view/user/browsing_history_screen/browsing_history_screen.dart';
 import 'package:amazon/view/user/notifications_screen/notifications_screen.dart';
 import 'package:amazon/view/user/orders_screen/orders_screen.dart';
@@ -318,28 +322,107 @@ class BuyAgain extends StatelessWidget {
             height * 0.02,
             0,
           ),
-          SizedBox(
-              height: height * 0.14,
-              child: ListView.builder(
-                  itemCount: 5,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  physics: const PageScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: height * 0.14,
-                      height: height * 0.14,
-                      margin: EdgeInsets.symmetric(horizontal: width * 0.02),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: greyShade3,
-                        ),
-                        borderRadius: BorderRadius.circular(
-                          10,
-                        ),
+          StreamBuilder<List<UserProductModel>>(
+              stream: UsersProductService.fetchOrders(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return SizedBox(
+                    height: height * 0.14,
+                    child: Center(
+                      child: SizedBox(
+                        height: height * 0.03,
+                        width: height * 0.03,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: amber),
                       ),
-                    );
-                  }))
+                    ),
+                  );
+                }
+                // Most-recently-ordered occurrence of each product, since
+                // fetchOrders() is already sorted by time descending.
+                final Map<String, UserProductModel> uniqueByProduct = {};
+                for (final order in snapshot.data!) {
+                  final String? productID = order.productID;
+                  if (productID != null &&
+                      !uniqueByProduct.containsKey(productID)) {
+                    uniqueByProduct[productID] = order;
+                  }
+                }
+                final List<UserProductModel> pastProducts =
+                    uniqueByProduct.values.take(5).toList();
+                if (pastProducts.isEmpty) {
+                  return Container(
+                    height: height * 0.14,
+                    width: width,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Nothing to buy again yet',
+                      style: textTheme.displayMedium,
+                    ),
+                  );
+                }
+                return SizedBox(
+                    height: height * 0.14,
+                    child: ListView.builder(
+                        itemCount: pastProducts.length,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        physics: const PageScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final UserProductModel item = pastProducts[index];
+                          final ProductModel product = ProductModel(
+                            imagesURL: item.imagesURL,
+                            name: item.name,
+                            category: item.category,
+                            description: item.description,
+                            brandName: item.brandName,
+                            manufacturerName: item.manufacturerName,
+                            countryOfOrigin: item.countryOfOrigin,
+                            specifications: item.specifications,
+                            price: item.price,
+                            discountedPrice: item.discountedPrice,
+                            productID: item.productID,
+                            productSellerID: item.productSellerID,
+                            inStock: item.inStock,
+                            discountPercentage: item.discountPercentage,
+                            uploadedAt: item.time,
+                          );
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                  child: ProductScreen(productModel: product),
+                                  type: PageTransitionType.rightToLeft,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: height * 0.14,
+                              height: height * 0.14,
+                              margin:
+                                  EdgeInsets.symmetric(horizontal: width * 0.02),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: greyShade3,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  10,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: ProductImage(
+                                  imageUrl: item.imagesURL?.isNotEmpty == true
+                                      ? item.imagesURL![0]
+                                      : null,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          );
+                        }));
+              })
         ],
       ),
     );
@@ -505,10 +588,6 @@ class UsersOrders extends StatelessWidget {
             );
           }
         });
-
-    // return
-
-    //
   }
 }
 
@@ -623,18 +702,32 @@ class UserGreetingsYouScreen extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: width * 0.04),
       child: Row(
         children: [
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(text: 'Hello, ', style: textTheme.bodyLarge),
-                TextSpan(
-                  text: 'Sanjay',
-                  style: textTheme.bodyLarge!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+          FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            future: currentUserPhone == null
+                ? null
+                : firestore.collection('users').doc(currentUserPhone).get(),
+            builder: (context, snapshot) {
+              String greetingName = 'there';
+              if (snapshot.hasData && snapshot.data!.exists) {
+                final UserModel user = UserModel.fromMap(snapshot.data!.data()!);
+                if (user.name != null && user.name!.isNotEmpty) {
+                  greetingName = user.name!;
+                }
+              }
+              return RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(text: 'Hello, ', style: textTheme.bodyLarge),
+                    TextSpan(
+                      text: greetingName,
+                      style: textTheme.bodyLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
           const Spacer(),
           CircleAvatar(

@@ -902,14 +902,21 @@ class HomePageAppBar extends StatelessWidget {
                       // Placeholder for a future visual-search feature: this
                       // only lets the user take a photo, it does not run
                       // any image-based product matching yet.
-                      final XFile? photo =
-                          await picker.pickImage(source: ImageSource.camera);
-                      if (photo == null) return;
-                      if (!context.mounted) return;
-                      CommonFunctions.showWarningToast(
-                          context: context,
-                          message:
-                              'Photo captured — visual product search coming soon');
+                      try {
+                        final XFile? photo = await picker.pickImage(
+                            source: ImageSource.camera);
+                        if (photo == null) return;
+                        if (!context.mounted) return;
+                        CommonFunctions.showWarningToast(
+                            context: context,
+                            message:
+                                'Photo captured — visual product search coming soon');
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        CommonFunctions.showErrorToast(
+                            context: context,
+                            message: 'Camera isn\'t available on this device.');
+                      }
                     },
                     child: Icon(
                       Icons.camera_alt_sharp,

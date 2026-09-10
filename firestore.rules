@@ -28,7 +28,17 @@ service cloud.firestore {
       allow create: if request.auth != null;
     }
     match /productSaleData/{productId}/{document=**} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null
+        && request.auth.token.phone_number == resource.data.productSellerID;
+      // The writer here is the BUYER completing checkout, not the seller —
+      // unlike Products' create rule, request.auth can never equal
+      // productSellerID. Instead, require the productSellerID being written
+      // to match the product's actual recorded seller, so any signed-in
+      // buyer can record their own purchase but can't forge a sale
+      // attributed to the wrong seller.
+      allow create: if request.auth != null
+        && request.resource.data.productSellerID ==
+           get(/databases/$(database)/documents/Products/$(productId)).data.productSellerID;
     }
     match /Address/{userId}/{document=**} {
       allow read, write: if request.auth != null && request.auth.token.phone_number == userId;

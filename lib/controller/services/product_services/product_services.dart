@@ -142,29 +142,47 @@ class ProductServices {
     }
   }
 
+  // The productSaleData Firestore rule scopes read access by
+  // `resource.data.productSellerID`. Since that condition depends on
+  // document content rather than just the path, Firestore requires the
+  // query itself to be provably restricted to matching documents (an
+  // unfiltered list query is rejected outright, not silently filtered) —
+  // so this needs the same `where` the rule checks, not just a client-side
+  // assumption that every doc under this productID already belongs to the
+  // signed-in seller.
   static Stream<List<UserProductModel>> fetchSalesPerProduct(
-          {required String productID}) =>
-      firestore
-          .collection('productSaleData')
-          .doc(productID)
-          .collection('purchase_history')
-
-          .snapshots()
-          .map((snapshot) => snapshot.docs.map((doc) {
-                return UserProductModel.fromMap(doc.data());
-              }).toList());
+      {required String productID}) {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      return const Stream.empty();
+    }
+    return firestore
+        .collection('productSaleData')
+        .doc(productID)
+        .collection('purchase_history')
+        .where('productSellerID', isEqualTo: phone)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return UserProductModel.fromMap(doc.data());
+            }).toList());
+  }
 
   /// Whether any of the seller's products have at least one sale recorded.
   /// Used to distinguish a genuine "no sales yet" empty state from a
   /// screen that has nothing to show for every product individually.
   static Future<bool> sellerHasAnySales(
       {required List<String> productIDs}) async {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      return false;
+    }
     try {
       for (final productID in productIDs) {
         final snapshot = await firestore
             .collection('productSaleData')
             .doc(productID)
             .collection('purchase_history')
+            .where('productSellerID', isEqualTo: phone)
             .limit(1)
             .get();
         if (snapshot.docs.isNotEmpty) {

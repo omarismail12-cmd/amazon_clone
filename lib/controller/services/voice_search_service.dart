@@ -14,25 +14,34 @@ class VoiceSearchService {
     required BuildContext context,
     required void Function(String recognizedText) onResult,
   }) async {
-    final bool available = await _speech.initialize(
-      onError: (error) => log('speech_to_text error: ${error.errorMsg}'),
-      onStatus: (status) => log('speech_to_text status: $status'),
-    );
-    if (!available) {
+    try {
+      final bool available = await _speech.initialize(
+        onError: (error) => log('speech_to_text error: ${error.errorMsg}'),
+        onStatus: (status) => log('speech_to_text status: $status'),
+      );
+      if (!available) {
+        if (!context.mounted) return;
+        CommonFunctions.showErrorToast(
+          context: context,
+          message:
+              'Voice search needs microphone access. Please allow it in your device settings.',
+        );
+        return;
+      }
+      await _speech.listen(
+        onResult: (result) {
+          if (result.finalResult && result.recognizedWords.trim().isNotEmpty) {
+            onResult(result.recognizedWords.trim());
+          }
+        },
+      );
+    } catch (e) {
+      log('Voice search failed: $e');
       if (!context.mounted) return;
       CommonFunctions.showErrorToast(
         context: context,
-        message:
-            'Voice search needs microphone access. Please allow it in your device settings.',
+        message: 'Voice search isn\'t available on this device.',
       );
-      return;
     }
-    await _speech.listen(
-      onResult: (result) {
-        if (result.finalResult && result.recognizedWords.trim().isNotEmpty) {
-          onResult(result.recognizedWords.trim());
-        }
-      },
-    );
   }
 }
