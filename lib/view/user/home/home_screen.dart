@@ -12,6 +12,7 @@ import 'package:amazon/controller/services/voice_search_service.dart';
 import 'package:amazon/model/address_model.dart';
 import 'package:amazon/model/product_model.dart';
 import 'package:amazon/utils/colors.dart';
+import 'package:amazon/view/common_widgets/product_image.dart';
 import 'package:amazon/view/common_widgets/wishlist_heart_button.dart';
 import 'package:amazon/view/user/address_screen/address_screen.dart';
 import 'package:amazon/view/user/product_category_screen/product_category_screen.dart';
@@ -223,9 +224,10 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                 ? demoProducts
                 : dealOfTheDayProvider.deals;
             // The full list can now run up to 50 items ("See all Deals"
-            // shows all of them); cap what's rendered inline here so the
-            // home screen carousel/grid doesn't turn into a 50-item page.
-            final List<ProductModel> previewDeals = deals.take(12).toList();
+            // shows all of them); the home screen only previews a small,
+            // fixed slice of the highest-discount items (already sorted
+            // descending by discount).
+            final List<ProductModel> previewDeals = deals.take(4).toList();
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -262,13 +264,13 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width,
-                                decoration: BoxDecoration(
-                                  color: white,
-                                  image: DecorationImage(
-                                    image: NetworkImage(
-                                        currentProduct.imagesURL![0]),
-                                    fit: BoxFit.contain,
-                                  ),
+                                color: white,
+                                child: ProductImage(
+                                  imageUrl: currentProduct.imagesURL?.isNotEmpty ==
+                                          true
+                                      ? currentProduct.imagesURL![0]
+                                      : null,
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
@@ -335,8 +337,14 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                             border: Border.all(
                               color: greyShade3,
                             ),
-                            image: DecorationImage(
-                              image: NetworkImage(currentModel.imagesURL![0]),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: ProductImage(
+                              imageUrl:
+                                  currentModel.imagesURL?.isNotEmpty == true
+                                      ? currentModel.imagesURL![0]
+                                      : null,
                               fit: BoxFit.contain,
                             ),
                           ),

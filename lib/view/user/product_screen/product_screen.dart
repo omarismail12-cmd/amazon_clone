@@ -9,6 +9,7 @@ import 'package:amazon/controller/services/product_services/product_services.dar
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/review_model.dart';
 import 'package:amazon/model/user_product_model.dart';
+import 'package:amazon/view/common_widgets/product_image.dart';
 import 'package:amazon/view/common_widgets/wishlist_heart_button.dart';
 import 'package:amazon/view/user/home/home_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -126,6 +127,64 @@ class _ProductScreenState extends State<ProductScreen> {
 // !
 // !
 // !
+  BoxDecoration _imageBoxDecoration(BuildContext context) => BoxDecoration(
+        color: white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      );
+
+  // A carousel only makes sense with more than one image — with 0 or 1
+  // images, skip CarouselSlider (and its autoplay/infinite-scroll machinery,
+  // which some products (e.g. ones with a single manually-pasted image URL)
+  // don't need) and render a single sized image directly instead.
+  Widget _buildImageArea(double height, double width) {
+    final List<String> images = widget.productModel.imagesURL ?? [];
+    if (images.length <= 1) {
+      return Builder(
+        builder: (context) => Container(
+          height: height * 0.23,
+          width: width,
+          decoration: _imageBoxDecoration(context),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: ProductImage(
+              imageUrl: images.isNotEmpty ? images.first : null,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      );
+    }
+    return CarouselSlider(
+      carouselController: CarouselSliderController(),
+      options: CarouselOptions(
+        height: height * 0.23,
+        autoPlay: true,
+        viewportFraction: 1,
+      ),
+      items: images.map((i) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: _imageBoxDecoration(context),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: ProductImage(imageUrl: i, fit: BoxFit.contain),
+              ),
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -152,41 +211,7 @@ class _ProductScreenState extends State<ProductScreen> {
             children: [
               Stack(
                 children: [
-                  CarouselSlider(
-                    carouselController: CarouselSliderController(),
-                    options: CarouselOptions(
-                      height: height * 0.23,
-                      autoPlay: true,
-                      viewportFraction: 1,
-                    ),
-                    items: widget.productModel.imagesURL!.map((i) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Container(
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              color: white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .shadow
-                                      .withValues(alpha: 0.1),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                              image: DecorationImage(
-                                image: NetworkImage(i),
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
+                  _buildImageArea(height, width),
                   Positioned(
                     top: 8,
                     right: 8,
