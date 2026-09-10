@@ -27,8 +27,12 @@ class _SignInLogicState extends State<SignInLogic> {
       log('start');
       log(userIsSeller.toString());
       if (userIsSeller == true) {
-        Navigator.pushAndRemoveUntil(
-          context,
+        // Use the root navigator, not the one Navigator.of(context) would
+        // find by default. If confirmSignOut() (or a prior run of this same
+        // method) left SignInLogic nested inside a PersistentTabView tab's
+        // own Navigator, a plain push here would insert the new nav bar
+        // *inside* the old one instead of replacing it.
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           PageTransition(
             child: const SellerBottomNavBar(),
             type: PageTransitionType.rightToLeft,
@@ -36,8 +40,7 @@ class _SignInLogicState extends State<SignInLogic> {
           (route) => false,
         );
       } else {
-        Navigator.pushAndRemoveUntil(
-          context,
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           PageTransition(
             child: const UserBottomNavBar(),
             type: PageTransitionType.rightToLeft,
@@ -46,8 +49,7 @@ class _SignInLogicState extends State<SignInLogic> {
         );
       }
     } else {
-      Navigator.pushAndRemoveUntil(
-        context,
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         PageTransition(
           child: const UserDataInputScrren(),
           type: PageTransitionType.rightToLeft,
@@ -61,8 +63,7 @@ class _SignInLogicState extends State<SignInLogic> {
     bool userIsAuthenticated = AuthServices.checkAuthentication();
     userIsAuthenticated
         ? checkUser()
-        : Navigator.pushAndRemoveUntil(
-            context,
+        : Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
             PageTransition(
                 child: const AuthScreen(),
                 type: PageTransitionType.rightToLeft),

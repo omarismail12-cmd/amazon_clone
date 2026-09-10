@@ -103,8 +103,14 @@ class AuthServices {
     if (confirmed != true) return;
     await signOut();
     if (!context.mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
+    // Sign-out can be triggered from a screen that's a tab inside
+    // PersistentTabView (Seller's Inventory/Monitor, buyer's
+    // Profile/Settings), which wraps every tab in its own nested Navigator.
+    // A plain Navigator.of(context) resolves to that nested Navigator, so
+    // this would only clear the tab's inner stack and leave the outer
+    // SellerBottomNavBar/UserBottomNavBar mounted — rootNavigator: true
+    // forces it to the app's actual root Navigator instead.
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
       PageTransition(
         child: const SignInLogic(),
         type: PageTransitionType.rightToLeft,

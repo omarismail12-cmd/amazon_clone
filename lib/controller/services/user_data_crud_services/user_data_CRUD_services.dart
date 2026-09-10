@@ -32,8 +32,10 @@ class UserDataCRUD {
         log('Data Added');
         CommonFunctions.showSuccessToast(
             context: context, message: 'User Added Successful');
-        Navigator.pushAndRemoveUntil(
-            context,
+        // rootNavigator: true for the same reason as the other
+        // pushAndRemoveUntil calls that reset to SignInLogic — see
+        // AuthServices.confirmSignOut for the full explanation.
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
             PageTransition(
                 child: const SignInLogic(),
                 type: PageTransitionType.rightToLeft),
