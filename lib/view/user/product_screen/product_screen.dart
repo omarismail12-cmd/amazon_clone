@@ -9,6 +9,7 @@ import 'package:amazon/controller/services/product_services/product_services.dar
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/review_model.dart';
 import 'package:amazon/model/user_product_model.dart';
+import 'package:amazon/view/common_widgets/wishlist_heart_button.dart';
 import 'package:amazon/view/user/home/home_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -149,40 +150,52 @@ class _ProductScreenState extends State<ProductScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CarouselSlider(
-                carouselController: CarouselSliderController(),
-                options: CarouselOptions(
-                  height: height * 0.23,
-                  autoPlay: true,
-                  viewportFraction: 1,
-                ),
-                items: widget.productModel.imagesURL!.map((i) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .shadow
-                                  .withValues(alpha: 0.1),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+              Stack(
+                children: [
+                  CarouselSlider(
+                    carouselController: CarouselSliderController(),
+                    options: CarouselOptions(
+                      height: height * 0.23,
+                      autoPlay: true,
+                      viewportFraction: 1,
+                    ),
+                    items: widget.productModel.imagesURL!.map((i) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                              color: white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .shadow
+                                      .withValues(alpha: 0.1),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                              image: DecorationImage(
+                                image: NetworkImage(i),
+                                fit: BoxFit.contain,
+                              ),
                             ),
-                          ],
-                          image: DecorationImage(
-                            image: NetworkImage(i),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
+                          );
+                        },
                       );
-                    },
-                  );
-                }).toList(),
+                    }).toList(),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: WishlistHeartButton(
+                      product: widget.productModel,
+                      size: 26,
+                    ),
+                  ),
+                ],
               ),
               CommonFunctions.blankSpace(
                 height * 0.02,

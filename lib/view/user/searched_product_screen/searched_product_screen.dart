@@ -6,7 +6,9 @@ import 'dart:developer';
 import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/provier/users_product_provider/users_product_provider.dart';
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
+import 'package:amazon/controller/services/voice_search_service.dart';
 import 'package:amazon/model/product_model.dart';
+import 'package:amazon/view/common_widgets/wishlist_heart_button.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -17,7 +19,9 @@ import '../../../model/user_product_model.dart';
 import '../../../utils/colors.dart';
 
 class SearchedProductScreen extends StatefulWidget {
-  const SearchedProductScreen({super.key});
+  const SearchedProductScreen({super.key, this.initialQuery});
+
+  final String? initialQuery;
 
   @override
   State<SearchedProductScreen> createState() => _SearchedProductScreenState();
@@ -26,6 +30,14 @@ class SearchedProductScreen extends StatefulWidget {
 class _SearchedProductScreenState extends State<SearchedProductScreen> {
   TextEditingController searchController = TextEditingController();
   Timer? _debounce;
+
+  void _onSearchChanged(String productName) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 1500), () {
+      if (!mounted) return;
+      context.read<UsersProductProvider>().filterProducts(productName);
+    });
+  }
 
   getDay(int dayNum) {
     switch (dayNum % 7) {
@@ -148,8 +160,16 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UsersProductProvider>().fetchAllProducts();
+    if (widget.initialQuery != null) {
+      searchController.text = widget.initialQuery!;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<UsersProductProvider>().fetchAllProducts();
+      if (widget.initialQuery != null && mounted) {
+        context.read<UsersProductProvider>().filterProducts(
+              widget.initialQuery!,
+            );
+      }
     });
   }
 
@@ -197,16 +217,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                     width: width * 0.68,
                     child: TextField(
                       controller: searchController,
-                      onChanged: (productName) {
-                        _debounce?.cancel();
-                        _debounce =
-                            Timer(const Duration(milliseconds: 1500), () {
-                          if (!mounted) return;
-                          context
-                              .read<UsersProductProvider>()
-                              .filterProducts(productName);
-                        });
-                      },
+                      onChanged: _onSearchChanged,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: width * 0.03,
@@ -221,10 +232,17 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                   ),
                   const Spacer(),
                   IconButton(
-                      onPressed: () {
-                        CommonFunctions.showWarningToast(
-                            context: context,
-                            message: 'Voice search coming soon');
+                      onPressed: () async {
+                        await VoiceSearchService.listen(
+                          context: context,
+                          onResult: (recognizedText) {
+                            if (!mounted) return;
+                            searchController.text = recognizedText;
+                            searchController.selection = TextSelection.collapsed(
+                                offset: recognizedText.length);
+                            _onSearchChanged(recognizedText);
+                          },
+                        );
                       },
                       icon: Icon(
                         Icons.mic,
@@ -286,12 +304,22 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                           children: [
                             Expanded(
                               flex: 2,
-                              child: Container(
-                                color: greyShade1,
-                                child: Image.network(
-                                  currentProduct.imagesURL![0],
-                                  fit: BoxFit.fitWidth,
-                                ),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    color: greyShade1,
+                                    child: Image.network(
+                                      currentProduct.imagesURL![0],
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: WishlistHeartButton(
+                                        product: currentProduct),
+                                  ),
+                                ],
                               ),
                             ),
                             Expanded(

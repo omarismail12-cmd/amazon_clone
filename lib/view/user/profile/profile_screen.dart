@@ -5,10 +5,12 @@ import 'package:amazon/model/product_model.dart';
 import 'package:amazon/model/user_product_model.dart';
 import 'package:amazon/utils/colors.dart';
 import 'package:amazon/view/user/browsing_history_screen/browsing_history_screen.dart';
+import 'package:amazon/view/user/notifications_screen/notifications_screen.dart';
 import 'package:amazon/view/user/orders_screen/orders_screen.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
 import 'package:amazon/view/user/searched_product_screen/searched_product_screen.dart';
 import 'package:amazon/view/user/settings_screen/settings_screen.dart';
+import 'package:amazon/view/user/wishlist_screen/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -52,8 +54,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const Spacer(),
                 IconButton(
                   onPressed: () {
-                    CommonFunctions.showWarningToast(
-                        context: context, message: 'No new notifications');
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        child: const NotificationsScreen(),
+                        type: PageTransitionType.rightToLeft,
+                      ),
+                    );
                   },
                   icon: Icon(
                     Icons.notifications_none,
@@ -547,8 +554,13 @@ class YouGridBtons extends StatelessWidget {
                 ),
               );
             } else if (index == 3) {
-              CommonFunctions.showWarningToast(
-                  context: context, message: 'Wish List coming soon');
+              Navigator.push(
+                context,
+                PageTransition(
+                  child: const WishlistScreen(),
+                  type: PageTransitionType.rightToLeft,
+                ),
+              );
             }
           },
           child: Container(

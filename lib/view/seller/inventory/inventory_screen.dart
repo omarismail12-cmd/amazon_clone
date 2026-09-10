@@ -3,6 +3,7 @@ import 'package:amazon/controller/provier/product_provider/product_provider.dart
 import 'package:amazon/controller/services/auth_services/auth_services.dart';
 import 'package:amazon/model/product_model.dart';
 import 'package:amazon/view/seller/add_product_screen/add_products_screen.dart';
+import 'package:amazon/view/user/notifications_screen/notifications_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -73,8 +74,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 const Spacer(),
                 IconButton(
                   onPressed: () {
-                    CommonFunctions.showWarningToast(
-                        context: context, message: 'No new notifications');
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        child: const NotificationsScreen(),
+                        type: PageTransitionType.rightToLeft,
+                      ),
+                    );
                   },
                   icon: Icon(
                     Icons.notifications_none,

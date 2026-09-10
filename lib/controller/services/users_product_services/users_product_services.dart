@@ -223,7 +223,7 @@ class UsersProductService {
       final QuerySnapshot<Map<String, dynamic>> snapshot = await firestore
           .collection('Products')
           .orderBy('discountPercentage', descending: true)
-          .limit(4)
+          .limit(50)
           .get();
       snapshot.docs.forEach((element) {
         sellersProducts.add(ProductModel.fromMap(element.data()));
@@ -302,6 +302,93 @@ class UsersProductService {
         .map((snapshot) => snapshot.docs.map((doc) {
               return UserProductModel.fromMap(doc.data());
             }).toList());
+  }
+
+  static Future<void> addToWishlist({
+    required BuildContext context,
+    required UserProductModel productModel,
+  }) async {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      CommonFunctions.showErrorToast(
+          context: context, message: 'No signed-in user found');
+      return;
+    }
+    try {
+      await firestore
+          .collection('Wishlist')
+          .doc(phone)
+          .collection('myWishlist')
+          .doc(productModel.productID)
+          .set(productModel.toMap());
+      if (!context.mounted) return;
+      CommonFunctions.showSuccessToast(
+          context: context, message: 'Added to Wish List');
+    } catch (e) {
+      log(e.toString());
+      if (!context.mounted) return;
+      CommonFunctions.showErrorToast(context: context, message: e.toString());
+    }
+  }
+
+  static Future<void> removeFromWishlist({
+    required BuildContext context,
+    required String productId,
+  }) async {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      CommonFunctions.showErrorToast(
+          context: context, message: 'No signed-in user found');
+      return;
+    }
+    try {
+      await firestore
+          .collection('Wishlist')
+          .doc(phone)
+          .collection('myWishlist')
+          .doc(productId)
+          .delete();
+      if (!context.mounted) return;
+      CommonFunctions.showSuccessToast(
+          context: context, message: 'Removed from Wish List');
+    } catch (e) {
+      log(e.toString());
+      if (!context.mounted) return;
+      CommonFunctions.showErrorToast(context: context, message: e.toString());
+    }
+  }
+
+  static Stream<List<UserProductModel>> fetchWishlist() {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      return const Stream.empty();
+    }
+    return firestore
+        .collection('Wishlist')
+        .doc(phone)
+        .collection('myWishlist')
+        .orderBy('time', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return UserProductModel.fromMap(doc.data());
+            }).toList());
+  }
+
+  /// Streams whether [productId] is currently in the signed-in user's
+  /// wishlist, keyed directly off the doc ID (mirrors how it's written) so
+  /// callers don't need a query just to render a heart icon's fill state.
+  static Stream<bool> isProductWishlisted(String productId) {
+    final String? phone = currentUserPhone;
+    if (phone == null) {
+      return Stream.value(false);
+    }
+    return firestore
+        .collection('Wishlist')
+        .doc(phone)
+        .collection('myWishlist')
+        .doc(productId)
+        .snapshots()
+        .map((doc) => doc.exists);
   }
 
   static Future fetchCart() async {

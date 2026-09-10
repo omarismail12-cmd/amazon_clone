@@ -1,4 +1,3 @@
-import 'package:amazon/constants/common_functions.dart';
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/model/user_product_model.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +5,7 @@ import 'package:page_transition/page_transition.dart';
 
 import '../../../model/product_model.dart';
 import '../../../utils/colors.dart';
+import '../notifications_screen/notifications_screen.dart';
 import '../product_screen/product_screen.dart';
 import '../searched_product_screen/searched_product_screen.dart';
 
@@ -49,8 +49,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
               const Spacer(),
               IconButton(
                 onPressed: () {
-                  CommonFunctions.showWarningToast(
-                      context: context, message: 'No new notifications');
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      child: const NotificationsScreen(),
+                      type: PageTransitionType.rightToLeft,
+                    ),
+                  );
                 },
                 icon: Icon(
                   Icons.notifications_none,

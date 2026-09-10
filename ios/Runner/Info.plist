@@ -47,5 +47,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Amazon uses your microphone for voice search.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Amazon uses speech recognition to turn your voice into a search query.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Amazon uses your camera to take photos for product search and reviews.</string>
 </dict>
 </plist>

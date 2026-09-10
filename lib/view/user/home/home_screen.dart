@@ -8,15 +8,18 @@ import 'package:amazon/constants/demo_products.dart';
 import 'package:amazon/controller/provier/address_provider.dart';
 import 'package:amazon/controller/provier/deal_of_the_day_provider/deal_of_the_provider.dart';
 import 'package:amazon/controller/services/user_data_crud_services/user_data_CRUD_services.dart';
+import 'package:amazon/controller/services/voice_search_service.dart';
 import 'package:amazon/model/address_model.dart';
 import 'package:amazon/model/product_model.dart';
 import 'package:amazon/utils/colors.dart';
+import 'package:amazon/view/common_widgets/wishlist_heart_button.dart';
 import 'package:amazon/view/user/address_screen/address_screen.dart';
 import 'package:amazon/view/user/product_category_screen/product_category_screen.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
 import 'package:amazon/view/user/searched_product_screen/searched_product_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
@@ -219,6 +222,10 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
             final List<ProductModel> deals = dealOfTheDayProvider.deals.isEmpty
                 ? demoProducts
                 : dealOfTheDayProvider.deals;
+            // The full list can now run up to 50 items ("See all Deals"
+            // shows all of them); cap what's rendered inline here so the
+            // home screen carousel/grid doesn't turn into a 50-item page.
+            final List<ProductModel> previewDeals = deals.take(12).toList();
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -236,32 +243,42 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                     autoPlay: true,
                     viewportFraction: 1,
                   ),
-                  items: deals.map((i) {
+                  items: previewDeals.map((i) {
                     ProductModel currentProduct = i;
                     return Builder(
                       builder: (BuildContext context) {
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              PageTransition(
-                                child:
-                                    ProductScreen(productModel: currentProduct),
-                                type: PageTransitionType.rightToLeft,
-                              ),
-                            );
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              color: white,
-                              image: DecorationImage(
-                                image:
-                                    NetworkImage(currentProduct.imagesURL![0]),
-                                fit: BoxFit.contain,
+                        return Stack(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  PageTransition(
+                                    child: ProductScreen(
+                                        productModel: currentProduct),
+                                    type: PageTransitionType.rightToLeft,
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  color: white,
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                        currentProduct.imagesURL![0]),
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: WishlistHeartButton(
+                                  product: currentProduct),
+                            ),
+                          ],
                         );
                       },
                     );
@@ -297,7 +314,7 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                 ),
                 CommonFunctions.blankSpace(height * 0.01, 0),
                 GridView.builder(
-                    itemCount: deals.length,
+                    itemCount: previewDeals.length,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -306,7 +323,7 @@ class TodaysDealHomeScreenWidget extends StatelessWidget {
                             crossAxisSpacing: 20),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      ProductModel currentModel = deals[index];
+                      ProductModel currentModel = previewDeals[index];
                       return InkWell(
                         onTap: () {
                           log(index.toString());
@@ -442,12 +459,12 @@ class CategoryGridSection extends StatelessWidget {
     {
       'image': 'women_fashion.jpg',
       'title': "Women's Fashion",
-      'category': 'Fashion',
+      'category': "Women's Fashion",
     },
     {
       'image': 'men_fashion.jpg',
       'title': "Men's Fashion",
-      'category': 'Fashion',
+      'category': "Men's Fashion",
     },
     {
       'image': 'electronics.jpg',
@@ -467,7 +484,7 @@ class CategoryGridSection extends StatelessWidget {
     {
       'image': 'sports_shoes.jpg',
       'title': 'Sports & Shoes',
-      'category': 'Fashion',
+      'category': 'Sports & Shoes',
     },
   ];
 
@@ -873,10 +890,18 @@ class HomePageAppBar extends StatelessWidget {
                   ),
                   const Spacer(),
                   InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      // Placeholder for a future visual-search feature: this
+                      // only lets the user take a photo, it does not run
+                      // any image-based product matching yet.
+                      final XFile? photo =
+                          await picker.pickImage(source: ImageSource.camera);
+                      if (photo == null) return;
+                      if (!context.mounted) return;
                       CommonFunctions.showWarningToast(
                           context: context,
-                          message: 'Image search coming soon');
+                          message:
+                              'Photo captured — visual product search coming soon');
                     },
                     child: Icon(
                       Icons.camera_alt_sharp,
@@ -888,9 +913,21 @@ class HomePageAppBar extends StatelessWidget {
             ),
           ),
           IconButton(
-              onPressed: () {
-                CommonFunctions.showWarningToast(
-                    context: context, message: 'Voice search coming soon');
+              onPressed: () async {
+                await VoiceSearchService.listen(
+                  context: context,
+                  onResult: (recognizedText) {
+                    if (!context.mounted) return;
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        child: SearchedProductScreen(
+                            initialQuery: recognizedText),
+                        type: PageTransitionType.rightToLeft,
+                      ),
+                    );
+                  },
+                );
               },
               icon: Icon(
                 Icons.mic,
