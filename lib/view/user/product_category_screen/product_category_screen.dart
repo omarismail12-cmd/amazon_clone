@@ -7,6 +7,7 @@ import 'package:amazon/controller/provier/users_product_provider/users_product_p
 import 'package:amazon/controller/services/users_product_services/users_product_services.dart';
 import 'package:amazon/controller/services/voice_search_service.dart';
 import 'package:amazon/model/product_model.dart';
+import 'package:amazon/view/common_widgets/product_image.dart';
 import 'package:amazon/view/common_widgets/wishlist_heart_button.dart';
 import 'package:amazon/view/user/product_screen/product_screen.dart';
 import 'package:flutter/material.dart';
@@ -295,8 +296,12 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                 children: [
                                   Container(
                                     color: greyShade1,
-                                    child: Image.network(
-                                      currentProduct.imagesURL![0],
+                                    child: ProductImage(
+                                      imageUrl: currentProduct
+                                                  .imagesURL?.isNotEmpty ==
+                                              true
+                                          ? currentProduct.imagesURL![0]
+                                          : null,
                                       fit: BoxFit.fitWidth,
                                     ),
                                   ),
