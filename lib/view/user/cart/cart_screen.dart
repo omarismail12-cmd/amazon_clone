@@ -155,10 +155,20 @@ class _CartScreenState extends State<CartScreen> {
                       );
                     }
                     log(cartProducts.length.toString());
+                    final cartTotal = cartProducts.fold(
+                        0.0,
+                        (previousValue, product) =>
+                            previousValue +
+                            (product.productCount! * product.discountedPrice!));
                     return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Card(
+                            elevation: 3,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: greyShade3),
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
                               child: Column(
@@ -173,7 +183,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                         TextSpan(
                                           text:
-                                              '\$ ${cartProducts.fold(0.0, (previousValue, product) => previousValue + (product.productCount! * product.discountedPrice!)).toStringAsFixed(0)}',
+                                              '\$ ${cartTotal.toStringAsFixed(0)}',
                                           style:
                                               textTheme.displaySmall!.copyWith(
                                             fontWeight: FontWeight.bold,
@@ -223,20 +233,99 @@ class _CartScreenState extends State<CartScreen> {
                                     height * 0.02,
                                     0,
                                   ),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: greyShade1,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text('Items',
+                                                style: textTheme.bodySmall),
+                                            Text(
+                                              '\$ ${cartTotal.toStringAsFixed(0)}',
+                                              style: textTheme.bodySmall,
+                                            ),
+                                          ],
+                                        ),
+                                        CommonFunctions.blankSpace(
+                                          height * 0.005,
+                                          0,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text('Delivery',
+                                                style: textTheme.bodySmall),
+                                            Text('Free',
+                                                style: textTheme.bodySmall!
+                                                    .copyWith(color: teal)),
+                                          ],
+                                        ),
+                                        CommonFunctions.blankSpace(
+                                          height * 0.008,
+                                          0,
+                                        ),
+                                        const Divider(height: 1),
+                                        CommonFunctions.blankSpace(
+                                          height * 0.008,
+                                          0,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Total',
+                                              style: textTheme.bodyMedium!
+                                                  .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              '\$ ${cartTotal.toStringAsFixed(0)}',
+                                              style: textTheme.bodyMedium!
+                                                  .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  CommonFunctions.blankSpace(
+                                    height * 0.02,
+                                    0,
+                                  ),
                                   ElevatedButton(
                                     onPressed: () async {
-                                      final cartTotal = cartProducts.fold(
-                                          0.0,
-                                          (previousValue, product) =>
-                                              previousValue +
-                                              (product.productCount! *
-                                                  product.discountedPrice!));
                                       executePayment(cartTotal);
                                     },
                                     style: ElevatedButton.styleFrom(
+                                      backgroundColor: amber,
+                                      foregroundColor: black,
                                       minimumSize: Size(width, height * 0.06),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
                                     ),
-                                    child: const Text('Proceed to Buy'),
+                                    child: Text(
+                                      'Proceed to Buy',
+                                      style: textTheme.bodyMedium!.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
