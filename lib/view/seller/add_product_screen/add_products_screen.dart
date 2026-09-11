@@ -331,13 +331,22 @@ class ProductImageBanner extends StatelessWidget {
   final TextTheme textTheme;
   final TextEditingController imageUrlController;
 
-  void _addImageUrl(BuildContext context) {
+  Future<void> _addImageUrl(BuildContext context) async {
     final url = imageUrlController.text.trim();
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       CommonFunctions.showErrorToast(
           context: context, message: 'Please enter a valid image URL');
       return;
     }
+
+    final loadsOk = await CommonFunctions.canLoadNetworkImage(context, url);
+    if (!loadsOk) {
+      final addAnyway = await CommonFunctions.showBrokenImageUrlWarning(
+        context,
+      );
+      if (!addAnyway) return;
+    }
+
     context.read<SellerProductProvider>().addManualImageUrl(url);
     imageUrlController.clear();
   }
@@ -508,6 +517,13 @@ class ProductImageBanner extends StatelessWidget {
                 child: const Text('Add'),
               ),
             ],
+          ),
+          CommonFunctions.blankSpace(height * 0.005, 0),
+          Text(
+            'Tip: images from ibb.co/imgbb links are most reliable. Some '
+            'websites block direct image loading (CORS) which can cause '
+            'broken images on the web version.',
+            style: textTheme.labelSmall!.copyWith(color: grey),
           ),
         ],
       );

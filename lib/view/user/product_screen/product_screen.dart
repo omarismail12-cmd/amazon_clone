@@ -104,6 +104,31 @@ class _ProductScreenState extends State<ProductScreen> {
 
   void _handleExternalWallet(ExternalWalletResponse response) {}
 
+  // See the CORS note on CommonFunctions.canLoadNetworkImage — a pasted
+  // review-photo URL can look fine on Android/iOS while being unloadable
+  // on the web version, so it's checked here before being accepted.
+  Future<void> _addReviewImageUrl(BuildContext context) async {
+    final url = reviewImageUrlController.text.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      CommonFunctions.showErrorToast(
+        context: context,
+        message: 'Please enter a valid image URL',
+      );
+      return;
+    }
+
+    final loadsOk = await CommonFunctions.canLoadNetworkImage(context, url);
+    if (!loadsOk) {
+      final addAnyway = await CommonFunctions.showBrokenImageUrlWarning(
+        context,
+      );
+      if (!addAnyway) return;
+    }
+
+    context.read<RatingProvider>().addManualImageUrl(url);
+    reviewImageUrlController.clear();
+  }
+
   executePayment() {
     var options = {
       'key': keyID,
@@ -745,26 +770,20 @@ class _ProductScreenState extends State<ProductScreen> {
                           ),
                           CommonFunctions.blankSpace(0, width * 0.02),
                           ElevatedButton(
-                            onPressed: () {
-                              final url = reviewImageUrlController.text.trim();
-                              if (!url.startsWith('http://') &&
-                                  !url.startsWith('https://')) {
-                                CommonFunctions.showErrorToast(
-                                  context: context,
-                                  message: 'Please enter a valid image URL',
-                                );
-                                return;
-                              }
-                              context
-                                  .read<RatingProvider>()
-                                  .addManualImageUrl(url);
-                              reviewImageUrlController.clear();
-                            },
+                            onPressed: () => _addReviewImageUrl(context),
                             style:
                                 ElevatedButton.styleFrom(backgroundColor: amber),
                             child: const Text('Add'),
                           ),
                         ],
+                      ),
+                      CommonFunctions.blankSpace(height * 0.005, 0),
+                      Text(
+                        'Tip: images from ibb.co/imgbb links are most '
+                        'reliable. Some websites block direct image loading '
+                        '(CORS) which can cause broken images on the web '
+                        'version.',
+                        style: textTheme.labelSmall!.copyWith(color: grey),
                       ),
                       RatingBar(
                         initialRating: 0,
